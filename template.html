@@ -786,6 +786,30 @@
     return h + '</tbody></table>';
   }
 
+  function getTeacherSlotTimeMap(d){
+    const bell = DATA.bellSchedules[d.type] || [];
+    const out = {};
+    bell.forEach(b => {
+      const name = (b.name || '').trim();
+      const time = (b.start && b.end) ? `${b.start}-${b.end}` : '';
+      if (!time || !name) return;
+      if (name.includes('第一節') && !out.p1) out.p1 = time;
+      else if (name.includes('第二節') && !out.p2) out.p2 = time;
+      else if (name.includes('第三節') && !out.p3) out.p3 = time;
+      else if (name.includes('第四節') && !out.p4) out.p4 = time;
+      else if (name.includes('第五節') && !out.p5) out.p5 = time;
+      else if (name.includes('第六節') && !out.p6) out.p6 = time;
+      else if (name.includes('午膳') && !out.lunch) out.lunch = time;
+      else if (name.includes('小息')) {
+        if (!out.recess1) out.recess1 = time;
+        else if (!out.recess2) out.recess2 = time;
+      } else if ((name.includes('當值') || name.includes('放學')) && !out.duty) {
+        out.duty = time;
+      }
+    });
+    return out;
+  }
+
   function renderMorningDuty(md){
     if (!md) return '';
     let h = `<div><strong>${escapeHtml(md.title || '')}</strong>`;
@@ -924,12 +948,15 @@
     else if (d.weekday === '五') order = SLOT_ORDER_FRIDAY;
     else order = SLOT_ORDER_FULL;
     const labels = d.type === 'half-day' ? SLOT_LABELS_HALF : SLOT_LABELS_FULL;
+    const slotTimes = getTeacherSlotTimeMap(d);
 
     let h = '<div class="teacher-schedule-list">';
     order.forEach(s => {
       const v = (ts.slots||{})[s] || '';
       const cls = v ? 'teacher-slot' : 'teacher-slot empty';
-      h += `<div class="${cls}"><div class="k">${escapeHtml(labels[s]||s)}</div><div class="v">${escapeHtml(v) || '—'}</div></div>`;
+      const label = labels[s] || s;
+      const withTime = slotTimes[s] ? `${label}（${slotTimes[s]}）` : label;
+      h += `<div class="${cls}"><div class="k">${escapeHtml(withTime)}</div><div class="v">${escapeHtml(v) || '—'}</div></div>`;
     });
     h += '</div>';
 
