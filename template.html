@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="zh-Hant-HK">
+<head>
+<meta charset="utf-8">
+<title>佛教志蓮小學 — 6至7月時間表查詢</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --panel: #ffffff;
+    --ink: #1f2330;
+    --muted: #6c7280;
+    --line: #d9d4c4;
+    --accent: #b03a2e;
+    --accent-soft: #f2dcd8;
+    --highlight: #fff6c2;
+    --duty: #e6efe6;
+    --recess: #f0f0f0;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  header.appbar {
+    background: var(--accent);
+    color: #fff;
+    padding: 14px 20px;
+    border-bottom: 3px solid #861f17;
+  }
+  header.appbar h1 {
+    margin: 0; font-size: 20px; font-weight: 600;
+  }
+  header.appbar .sub {
+    font-size: 13px; opacity: 0.9; margin-top: 2px;
+  }
+  nav.tabs {
+    display: flex; gap: 0;
+    background: #efeadc;
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 10;
+  }
+  nav.tabs button {
+    flex: 1;
+    padding: 12px 8px;
+    background: transparent;
+    border: none;
+    border-right: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 15px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  nav.tabs button:last-child { border-right: none; }
+  nav.tabs button.active {
+    background: var(--panel);
+    border-bottom: 3px solid var(--accent);
+    font-weight: 600;
+  }
+  nav.tabs button:hover:not(.active) { background: #e3dcc7; }
+
+  main { padding: 18px; max-width: 1300px; margin: 0 auto; }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .panel h2 {
+    margin: 0 0 12px 0;
+    font-size: 17px;
+    border-bottom: 2px solid var(--accent-soft);
+    padding-bottom: 8px;
+  }
+  .filters {
+    display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 14px;
+  }
+  .filters label { font-size: 14px; color: var(--muted); }
+  .filters select {
+    font-family: inherit; font-size: 16px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+    min-width: 160px;
+  }
+
+  table.grid {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  table.grid th, table.grid td {
+    border: 1px solid var(--line);
+    padding: 6px 8px;
+    text-align: center;
+    vertical-align: middle;
+  }
+  table.grid th {
+    background: #efeadc;
+    font-weight: 600;
+  }
+  table.grid td.label { background: #faf7ee; font-weight: 600; }
+  table.grid td.empty { color: var(--muted); }
+  table.grid td.recess { background: var(--recess); }
+  table.grid td.duty { background: var(--duty); }
+  table.grid td.highlight { background: var(--highlight); }
+  table.grid tr.section-head td {
+    background: #efeadc; font-weight: 600; text-align: left;
+  }
+
+  .day-banner {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .day-banner .date {
+    font-size: 22px; font-weight: 700;
+  }
+  .day-banner .badge {
+    padding: 3px 10px; border-radius: 99px;
+    font-size: 13px; font-weight: 600;
+  }
+  .badge.full { background: #e3f1e3; color: #2b6a2b; }
+  .badge.half { background: #fde7d3; color: #8e4316; }
+
+  .activities {
+    background: #fffaf2;
+    border-left: 4px solid #c6a161;
+    padding: 10px 12px;
+    font-size: 14px;
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+  .activities.empty { color: var(--muted); font-style: italic; }
+
+  table.bell {
+    width: auto; min-width: 480px;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  table.bell th, table.bell td {
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+  }
+  table.bell th { background: #efeadc; }
+  table.bell tr.recess td { background: #f7f0e0; }
+
+  .class-matrix {
+    overflow-x: auto;
+  }
+  .class-matrix table {
+    min-width: 700px;
+  }
+  .class-matrix td {
+    font-size: 13px;
+    min-width: 84px;
+  }
+  .class-matrix th.cls {
+    background: #efeadc;
+    position: sticky; left: 0;
+  }
+  .class-matrix td.cls {
+    background: #faf7ee;
+    font-weight: 600;
+    position: sticky; left: 0;
+  }
+
+  .teacher-view td, .class-view td {
+    font-size: 15px;
+    min-width: 110px;
+  }
+
+  .morning-duty .station-row td.location { text-align: left; }
+  .morning-duty .station-row td.people { text-align: left; font-weight: 600; }
+  .morning-duty .footnotes {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .morning-duty .footnotes p { margin: 2px 0; }
+
+  .duty-section {
+    margin-top: 14px;
+  }
+  .duty-section h3 {
+    font-size: 14px;
+    margin: 8px 0 4px 0;
+    color: var(--muted);
+  }
+  .duty-section table { min-width: 360px; width: auto; }
+  .duty-section td.label { text-align: left; }
+
+  .no-data { color: var(--muted); font-style: italic; padding: 10px 0; }
+
+  @media print {
+    header.appbar, nav.tabs { display: none; }
+    main { padding: 0; max-width: none; }
+    .panel { break-inside: avoid; box-shadow: none; border: 1px solid #999; }
+    .tab-content:not(.active) { display: none !important; }
+  }
+
+  @media (max-width: 640px) {
+    main { padding: 10px; }
+    .panel { padding: 12px; }
+    nav.tabs button { font-size: 13px; padding: 10px 4px; }
+    .day-banner .date { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
+  <div class="sub" id="meta-sub"></div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="day" class="active">📅 揀日子睇全日</button>
+  <button data-tab="teacher">👤 揀老師</button>
+  <button data-tab="class">🏫 揀班別</button>
+  <button data-tab="morning">🌅 早上特別當值</button>
+</nav>
+
+<main>
+
+  <!-- Tab: Day overview -->
+  <section class="tab-content active" id="tab-day">
+    <div class="panel">
+      <div class="filters">
+        <label>日期：</label>
+        <select id="day-date"></select>
+      </div>
+      <div id="day-banner"></div>
+      <div id="day-activities"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🔔 鐘聲時間表</h2>
+      <div id="day-bell"></div>
+    </div>
+
+    <div class="panel" id="day-morning-duty-panel">
+      <h2>🌅 早上特別當值</h2>
+      <div id="day-morning-duty"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🛡️ 其他當值（小息／午膳／放學）</h2>
+      <div id="day-duties"></div>
+    </div>
+
+    <div class="panel">
+      <h2>📋 班別總表（22 班 × 每節）</h2>
+      <div class="class-matrix" id="day-class-matrix"></div>
+    </div>
+  </section>
+
+  <!-- Tab: Teacher -->
+  <section class="tab-content" id="tab-teacher" hidden>
+    <div class="panel">
+      <div class="filters">
+        <label>日期：</label>
+        <select id="teacher-date"></select>
+        <label>老師：</label>
+        <select id="teacher-name"></select>
+      </div>
+      <div id="teacher-banner"></div>
+    </div>
+    <div class="panel">
+      <h2>👤 個人時間表</h2>
+      <div class="teacher-view" id="teacher-schedule"></div>
+    </div>
+  </section>
+
+  <!-- Tab: Class -->
+  <section class="tab-content" id="tab-class" hidden>
+    <div class="panel">
+      <div class="filters">
+        <label>日期：</label>
+        <select id="class-date"></select>
+        <label>班別：</label>
+        <select id="class-name"></select>
+      </div>
+      <div id="class-banner"></div>
+    </div>
+    <div class="panel">
+      <h2>🏫 班時間表</h2>
+      <div class="class-view" id="class-schedule"></div>
+    </div>
+  </section>
+
+  <!-- Tab: Morning duty -->
+  <section class="tab-content" id="tab-morning" hidden>
+    <div class="panel">
+      <div class="filters">
+        <label>日期：</label>
+        <select id="morning-date"></select>
+      </div>
+      <div id="morning-content" class="morning-duty"></div>
+    </div>
+  </section>
+
+</main>
+
+<script id="data" type="application/json">"__DATA_PLACEHOLDER__"</script>
+
+<script>
+(function(){
+  const DATA = JSON.parse(document.getElementById('data').textContent);
+  const SLOT_LABELS_FULL = {
+    p1: '第一節', p2: '第二節', recess1: '小息1',
+    p3: '第三節', recess2: '小息2', p4: '第四節',
+    lunch: '午膳/小息3', p5: '第五節', p6: '第六節', duty: '當值'
+  };
+  const SLOT_LABELS_HALF = {
+    p1: '第一節', p2: '第二節', recess1: '小息',
+    p3: '第三節', p4: '第四節', duty: '當值'
+  };
+  const SLOT_ORDER_FULL = ['p1','p2','recess1','p3','recess2','p4','lunch','p5','p6','duty'];
+  const SLOT_ORDER_HALF = ['p1','p2','recess1','p3','p4','duty'];
+  const SLOT_ORDER_FRIDAY = ['p1','p2','recess1','p3','recess2','p4','lunch','p5','duty'];  // no p6
+  const PERIOD_KEYS = ['p1','p2','p3','p4','p5','p6'];
+  const PERIOD_LABELS = ['第1節','第2節','第3節','第4節','第5節','第6節'];
+
+  document.getElementById('meta-sub').textContent =
+    `${DATA.meta.year} 學年｜${DATA.meta.version}｜共 ${DATA.days.length} 日有資料`;
+
+  // ---- Tab switching ----
+  const tabs = document.getElementById('tabs');
+  tabs.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-tab]');
+    if (!btn) return;
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b===btn));
+    document.querySelectorAll('.tab-content').forEach(sec => {
+      const on = sec.id === 'tab-' + btn.dataset.tab;
+      sec.classList.toggle('active', on);
+      sec.hidden = !on;
+    });
+  });
+
+  // ---- Populate selectors ----
+  function fillDateSelect(el, days){
+    el.innerHTML = '';
+    days.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.date;
+      o.textContent = d.label + (d.type === 'half-day' ? '（半天）' : '（全日）');
+      el.appendChild(o);
+    });
+  }
+
+  const dayDateSel = document.getElementById('day-date');
+  const teacherDateSel = document.getElementById('teacher-date');
+  const classDateSel = document.getElementById('class-date');
+  const morningDateSel = document.getElementById('morning-date');
+
+  fillDateSelect(dayDateSel, DATA.days);
+  fillDateSelect(teacherDateSel, DATA.days);
+  fillDateSelect(classDateSel, DATA.days);
+  fillDateSelect(morningDateSel, DATA.days.filter(d => d.morningDuty));
+
+  // Teacher dropdown
+  const teacherSel = document.getElementById('teacher-name');
+  DATA.teachers.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.short;
+    o.textContent = `${t.short}（${t.homeroom || '—'}）`;
+    teacherSel.appendChild(o);
+  });
+
+  // Class dropdown
+  const classSel = document.getElementById('class-name');
+  DATA.classes.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    classSel.appendChild(o);
+  });
+
+  // ---- Helpers ----
+  function findDay(iso){ return DATA.days.find(d => d.date === iso); }
+  function escapeHtml(s){
+    return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  }
+  function dayBanner(d){
+    const cls = d.type === 'full-day' ? 'full' : 'half';
+    const label = d.type === 'full-day' ? '全日' : '半天';
+    return `<div class="day-banner">
+      <span class="date">${escapeHtml(d.label)}</span>
+      <span class="badge ${cls}">${label}</span>
+    </div>`;
+  }
+
+  // ---- Render: Day overview ----
+  function renderDay(){
+    const iso = dayDateSel.value;
+    const d = findDay(iso);
+    if (!d) return;
+
+    document.getElementById('day-banner').innerHTML = dayBanner(d);
+
+    const acts = (d.activities || '').trim();
+    document.getElementById('day-activities').innerHTML = acts
+      ? `<div class="activities">${escapeHtml(acts)}</div>`
+      : `<div class="activities empty">當日無特別活動。</div>`;
+
+    // Bell schedule
+    const bell = DATA.bellSchedules[d.type] || [];
+    document.getElementById('day-bell').innerHTML = renderBell(bell);
+
+    // Morning duty
+    const mdPanel = document.getElementById('day-morning-duty-panel');
+    if (d.morningDuty) {
+      mdPanel.style.display = '';
+      document.getElementById('day-morning-duty').innerHTML = renderMorningDuty(d.morningDuty);
+    } else {
+      mdPanel.style.display = 'none';
+    }
+
+    // Other duties
+    document.getElementById('day-duties').innerHTML = renderDuties(d.duties || {});
+
+    // Class matrix
+    document.getElementById('day-class-matrix').innerHTML = renderClassMatrix(d);
+  }
+
+  function renderBell(bell){
+    if (!bell.length) return '<div class="no-data">無資料</div>';
+    let h = '<table class="bell"><thead><tr><th>時間</th><th>堂</th><th>備註</th></tr></thead><tbody>';
+    bell.forEach(b => {
+      const isRecess = b.name && (b.name.includes('小息') || b.name === '午膳');
+      h += `<tr class="${isRecess?'recess':''}"><td>${escapeHtml(b.start)} – ${escapeHtml(b.end)}</td><td>${escapeHtml(b.name)}</td><td>${escapeHtml(b.note||'')}</td></tr>`;
+    });
+    return h + '</tbody></table>';
+  }
+
+  function renderMorningDuty(md){
+    if (!md) return '';
+    let h = `<div><strong>${escapeHtml(md.title || '')}</strong>`;
+    if (md.subtitle) h += `<span style="color:var(--muted); margin-left:8px;">${escapeHtml(md.subtitle)}</span>`;
+    h += '</div>';
+    h += '<table class="grid" style="margin-top:10px;"><thead><tr><th style="min-width:130px">時間</th><th style="min-width:200px">地點</th><th>人手</th></tr></thead><tbody>';
+    md.stations.forEach(s => {
+      h += `<tr class="station-row"><td>${escapeHtml(s.time)}</td><td class="location">${escapeHtml(s.location)}</td><td class="people">${escapeHtml(s.people)}</td></tr>`;
+    });
+    h += '</tbody></table>';
+    if (md.footnotes && md.footnotes.length) {
+      h += '<div class="footnotes">';
+      md.footnotes.forEach(f => h += `<p>${escapeHtml(f)}</p>`);
+      h += '</div>';
+    }
+    return h;
+  }
+
+  function renderDuties(duties){
+    const sections = [
+      ['recess1', '小息一當值'],
+      ['recess2', '小息二當值'],
+      ['lunch_sup', '午膳當值（各班）'],
+      ['lunch_recess', '午息當值'],
+      ['dismissal', '放學當值'],
+    ];
+    let html = '';
+    let any = false;
+    sections.forEach(([key, title]) => {
+      const items = duties[key];
+      if (!items || !items.length) return;
+      any = true;
+      html += `<div class="duty-section"><h3>${title}</h3>`;
+      html += '<table class="grid"><tbody>';
+      items.forEach(it => {
+        html += `<tr><td class="label">${escapeHtml(it.label || '—')}</td><td>${escapeHtml(it.value)}</td></tr>`;
+      });
+      html += '</tbody></table></div>';
+    });
+    return any ? html : '<div class="no-data">當日無其他當值資料</div>';
+  }
+
+  function renderClassMatrix(d){
+    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
+    let h = '<table class="grid"><thead><tr><th class="cls">班別</th>';
+    for (let i=1; i<=nP; i++) h += `<th>第${i}節</th>`;
+    h += '</tr></thead><tbody>';
+    DATA.classes.forEach(c => {
+      const sched = d.classSchedules[c] || {};
+      h += `<tr><td class="cls">${escapeHtml(c)}</td>`;
+      for (let i=1; i<=nP; i++) {
+        const v = sched['p'+i] || '';
+        h += `<td class="${v?'':'empty'}">${escapeHtml(v) || '—'}</td>`;
+      }
+      h += '</tr>';
+    });
+    return h + '</tbody></table>';
+  }
+
+  // ---- Render: Teacher view ----
+  function renderTeacher(){
+    const iso = teacherDateSel.value;
+    const short = teacherSel.value;
+    const d = findDay(iso);
+    if (!d) return;
+    const ts = (d.teacherSchedules || {})[short];
+    document.getElementById('teacher-banner').innerHTML = dayBanner(d) +
+      `<div style="margin-top:8px;font-size:15px;">老師：<strong>${escapeHtml(short)}</strong>` +
+      (ts && ts.homeroom ? `　班主任：<strong>${escapeHtml(ts.homeroom)}</strong>` : '') + '</div>';
+    if (!ts) {
+      document.getElementById('teacher-schedule').innerHTML =
+        '<div class="no-data">當日無此老師資料</div>';
+      return;
+    }
+    let order;
+    if (d.type === 'half-day') order = SLOT_ORDER_HALF;
+    else if (d.weekday === '五') order = SLOT_ORDER_FRIDAY;
+    else order = SLOT_ORDER_FULL;
+    const labels = d.type === 'half-day' ? SLOT_LABELS_HALF : SLOT_LABELS_FULL;
+
+    let h = '<table class="grid"><thead><tr>';
+    order.forEach(s => h += `<th>${labels[s]||s}</th>`);
+    h += '</tr></thead><tbody><tr>';
+    order.forEach(s => {
+      const v = (ts.slots||{})[s] || '';
+      const isRecess = s === 'recess1' || s === 'recess2' || s === 'lunch';
+      const isDuty = s === 'duty';
+      const cls = isRecess ? 'recess' : (isDuty ? 'duty' : '') + (v ? '' : ' empty');
+      h += `<td class="${cls.trim()}">${escapeHtml(v) || '—'}</td>`;
+    });
+    h += '</tr></tbody></table>';
+
+    // Add cross-references: lessons by class (from classSchedules)
+    h += '<div style="margin-top:18px; font-size:14px; color:var(--muted);">';
+    h += '從班總表交叉檢查（顯示由老師單名出現喺邊個班嘅邊節）：';
+    h += '</div>';
+    h += '<table class="grid" style="margin-top:6px;">';
+    h += '<thead><tr><th>班</th>';
+    const nP = d.periodCount || 6;
+    for (let i=1;i<=nP;i++) h += `<th>第${i}節</th>`;
+    h += '</tr></thead><tbody>';
+    let hasMatches = false;
+    DATA.classes.forEach(c => {
+      const sched = d.classSchedules[c] || {};
+      const cells = [];
+      let rowHasMatch = false;
+      for (let i=1;i<=nP;i++) {
+        const v = sched['p'+i] || '';
+        const matches = v.includes(`(${short})`) || v.includes(`/${short})`) || v.includes(`(${short}/`);
+        if (matches) rowHasMatch = true;
+        cells.push({v, matches});
+      }
+      if (rowHasMatch) {
+        hasMatches = true;
+        h += `<tr><td class="cls">${escapeHtml(c)}</td>`;
+        cells.forEach(({v, matches}) => {
+          h += `<td class="${matches ? 'highlight' : (v?'':'empty')}">${escapeHtml(v) || '—'}</td>`;
+        });
+        h += '</tr>';
+      }
+    });
+    if (!hasMatches) h += `<tr><td colspan="${nP+1}" style="color:var(--muted);font-style:italic;">無</td></tr>`;
+    h += '</tbody></table>';
+
+    document.getElementById('teacher-schedule').innerHTML = h;
+  }
+
+  // ---- Render: Class view ----
+  function renderClass(){
+    const iso = classDateSel.value;
+    const cls = classSel.value;
+    const d = findDay(iso);
+    if (!d) return;
+    document.getElementById('class-banner').innerHTML = dayBanner(d) +
+      `<div style="margin-top:8px;font-size:15px;">班別：<strong>${escapeHtml(cls)}</strong></div>`;
+    const sched = (d.classSchedules || {})[cls];
+    if (!sched) {
+      document.getElementById('class-schedule').innerHTML = '<div class="no-data">當日無此班資料</div>';
+      return;
+    }
+    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
+    let h = '<table class="grid"><thead><tr>';
+    for (let i=1;i<=nP;i++) h += `<th>第${i}節</th>`;
+    h += '</tr></thead><tbody><tr>';
+    for (let i=1;i<=nP;i++) {
+      const v = sched['p'+i] || '';
+      h += `<td class="${v?'':'empty'}">${escapeHtml(v) || '—'}</td>`;
+    }
+    h += '</tr></tbody></table>';
+    document.getElementById('class-schedule').innerHTML = h;
+  }
+
+  // ---- Render: Morning duty tab ----
+  function renderMorningTab(){
+    const iso = morningDateSel.value;
+    const d = findDay(iso);
+    if (!d || !d.morningDuty) {
+      document.getElementById('morning-content').innerHTML = '<div class="no-data">當日無早上特別當值</div>';
+      return;
+    }
+    document.getElementById('morning-content').innerHTML =
+      dayBanner(d) + renderMorningDuty(d.morningDuty);
+  }
+
+  // ---- Wire events ----
+  dayDateSel.addEventListener('change', renderDay);
+  teacherDateSel.addEventListener('change', renderTeacher);
+  teacherSel.addEventListener('change', renderTeacher);
+  classDateSel.addEventListener('change', renderClass);
+  classSel.addEventListener('change', renderClass);
+  morningDateSel.addEventListener('change', renderMorningTab);
+
+  // Initial render
+  renderDay();
+  renderTeacher();
+  renderClass();
+  renderMorningTab();
+})();
+</script>
+</body>
+</html>
