@@ -31,196 +31,292 @@
   ],
   "teachers": [
     {
-      "short": "仁",
-      "homeroom": "當值"
-    },
-    {
-      "short": "何",
-      "homeroom": "4A"
-    },
-    {
-      "short": "佩",
-      "homeroom": "3B"
-    },
-    {
-      "short": "俊",
-      "homeroom": "5A"
-    },
-    {
-      "short": "倩",
-      "homeroom": "6D"
-    },
-    {
-      "short": "偉",
-      "homeroom": "當值"
-    },
-    {
-      "short": "儀",
-      "homeroom": "5C"
-    },
-    {
-      "short": "可",
-      "homeroom": "1C"
-    },
-    {
-      "short": "呂",
-      "homeroom": "當值"
-    },
-    {
-      "short": "奕",
-      "homeroom": "4C"
-    },
-    {
-      "short": "尹",
-      "homeroom": "3A"
-    },
-    {
-      "short": "幗",
-      "homeroom": "當值"
-    },
-    {
-      "short": "恒",
-      "homeroom": "當值"
-    },
-    {
-      "short": "悄",
-      "homeroom": "當值"
-    },
-    {
-      "short": "慧",
-      "homeroom": "6E"
-    },
-    {
-      "short": "敏",
-      "homeroom": "2B"
-    },
-    {
-      "short": "智",
-      "homeroom": "4B"
-    },
-    {
-      "short": "曾",
-      "homeroom": "1C"
-    },
-    {
       "short": "李",
-      "homeroom": "1A"
-    },
-    {
-      "short": "杰",
-      "homeroom": "3C"
-    },
-    {
-      "short": "梅",
-      "homeroom": "當值"
-    },
-    {
-      "short": "淑",
-      "homeroom": "3C"
-    },
-    {
-      "short": "清",
-      "homeroom": "當值"
-    },
-    {
-      "short": "潔",
-      "homeroom": "早課"
-    },
-    {
-      "short": "燕",
-      "homeroom": "當值"
-    },
-    {
-      "short": "琪",
-      "homeroom": "5B"
-    },
-    {
-      "short": "瑤",
-      "homeroom": "4D"
-    },
-    {
-      "short": "瑩",
-      "homeroom": "當值"
-    },
-    {
-      "short": "碧",
-      "homeroom": "2A"
-    },
-    {
-      "short": "穎",
-      "homeroom": "5D"
-    },
-    {
-      "short": "穩",
-      "homeroom": "當值"
+      "homeroom": "1A",
+      "seq": 1,
+      "no": 1
     },
     {
       "short": "符",
-      "homeroom": "1A"
-    },
-    {
-      "short": "筠",
-      "homeroom": "2C"
-    },
-    {
-      "short": "紅",
-      "homeroom": "6C"
+      "homeroom": "1A",
+      "seq": 2,
+      "no": 2
     },
     {
       "short": "羅",
-      "homeroom": "1B"
-    },
-    {
-      "short": "美",
-      "homeroom": "4A/B"
-    },
-    {
-      "short": "茵",
-      "homeroom": "6A"
-    },
-    {
-      "short": "華",
-      "homeroom": "當值"
-    },
-    {
-      "short": "蔚",
-      "homeroom": "當值"
-    },
-    {
-      "short": "許",
-      "homeroom": "3B"
-    },
-    {
-      "short": "談",
-      "homeroom": "當值"
-    },
-    {
-      "short": "谷",
-      "homeroom": "當值"
+      "homeroom": "1B",
+      "seq": 3,
+      "no": 3
     },
     {
       "short": "趙",
-      "homeroom": "1B"
+      "homeroom": "1B",
+      "seq": 4,
+      "no": 4
     },
     {
-      "short": "軒",
-      "homeroom": "當值"
+      "short": "曾",
+      "homeroom": "1C",
+      "seq": 5,
+      "no": 5
+    },
+    {
+      "short": "可",
+      "homeroom": "1C",
+      "seq": 6,
+      "no": 6
+    },
+    {
+      "short": "碧",
+      "homeroom": "2A",
+      "seq": 7,
+      "no": 7
+    },
+    {
+      "short": "敏",
+      "homeroom": "2B",
+      "seq": 8,
+      "no": 8
+    },
+    {
+      "short": "筠",
+      "homeroom": "2C",
+      "seq": 9,
+      "no": 9
+    },
+    {
+      "short": "尹",
+      "homeroom": "3A",
+      "seq": 10,
+      "no": 10
+    },
+    {
+      "short": "佩",
+      "homeroom": "3B",
+      "seq": 11,
+      "no": 11
+    },
+    {
+      "short": "杰",
+      "homeroom": "3C",
+      "seq": 12,
+      "no": 12
+    },
+    {
+      "short": "何",
+      "homeroom": "4A",
+      "seq": 13,
+      "no": 13
+    },
+    {
+      "short": "智",
+      "homeroom": "4B",
+      "seq": 14,
+      "no": 14
+    },
+    {
+      "short": "奕",
+      "homeroom": "4C",
+      "seq": 15,
+      "no": 15
+    },
+    {
+      "short": "瑤",
+      "homeroom": "4D",
+      "seq": 16,
+      "no": 16
+    },
+    {
+      "short": "俊",
+      "homeroom": "5A",
+      "seq": 17,
+      "no": 17
+    },
+    {
+      "short": "琪",
+      "homeroom": "5B",
+      "seq": 18,
+      "no": 18
+    },
+    {
+      "short": "儀",
+      "homeroom": "5C",
+      "seq": 19,
+      "no": 19
+    },
+    {
+      "short": "穎",
+      "homeroom": "5D",
+      "seq": 20,
+      "no": 20
+    },
+    {
+      "short": "茵",
+      "homeroom": "6A",
+      "seq": 21,
+      "no": 21
     },
     {
       "short": "邵",
-      "homeroom": "6B"
+      "homeroom": "6B",
+      "seq": 22,
+      "no": 22
     },
     {
-      "short": "鄭",
-      "homeroom": "當值"
+      "short": "紅",
+      "homeroom": "6C",
+      "seq": 23,
+      "no": 23
+    },
+    {
+      "short": "倩",
+      "homeroom": "6D",
+      "seq": 24,
+      "no": 24
+    },
+    {
+      "short": "慧",
+      "homeroom": "6E",
+      "seq": 25,
+      "no": 25
+    },
+    {
+      "short": "華",
+      "homeroom": "當值",
+      "seq": 26,
+      "no": 26
+    },
+    {
+      "short": "燕",
+      "homeroom": "當值",
+      "seq": 27,
+      "no": 27
+    },
+    {
+      "short": "梅",
+      "homeroom": "當值",
+      "seq": 28,
+      "no": 28
+    },
+    {
+      "short": "谷",
+      "homeroom": "當值",
+      "seq": 29,
+      "no": 29
+    },
+    {
+      "short": "悄",
+      "homeroom": "當值",
+      "seq": 30,
+      "no": 30
+    },
+    {
+      "short": "軒",
+      "homeroom": "當值",
+      "seq": 31,
+      "no": 31
+    },
+    {
+      "short": "蔚",
+      "homeroom": "當值",
+      "seq": 32,
+      "no": 32
     },
     {
       "short": "雯",
-      "homeroom": "當值"
+      "homeroom": "當值",
+      "seq": 33,
+      "no": 33
+    },
+    {
+      "short": "幗",
+      "homeroom": "當值",
+      "seq": 34,
+      "no": 34
+    },
+    {
+      "short": "瑩",
+      "homeroom": "當值",
+      "seq": 35,
+      "no": 35
+    },
+    {
+      "short": "談",
+      "homeroom": "當值",
+      "seq": 36,
+      "no": 36
+    },
+    {
+      "short": "穩",
+      "homeroom": "當值",
+      "seq": 37,
+      "no": 37
+    },
+    {
+      "short": "仁",
+      "homeroom": "當值",
+      "seq": 38,
+      "no": 38
+    },
+    {
+      "short": "偉",
+      "homeroom": "當值",
+      "seq": 39,
+      "no": 39
+    },
+    {
+      "short": "鄭",
+      "homeroom": "當值",
+      "seq": 40,
+      "no": 40
+    },
+    {
+      "short": "恒",
+      "homeroom": "當值",
+      "seq": 41,
+      "no": 41
+    },
+    {
+      "short": "呂",
+      "homeroom": "當值",
+      "seq": 42,
+      "no": 42
+    },
+    {
+      "short": "清",
+      "homeroom": "當值",
+      "seq": 43,
+      "no": 43
+    },
+    {
+      "short": "潔",
+      "homeroom": "早課",
+      "seq": 44,
+      "no": 45
+    },
+    {
+      "short": "許",
+      "homeroom": "3B",
+      "seq": 45,
+      "no": null
+    },
+    {
+      "short": "美",
+      "homeroom": "4A/B",
+      "seq": 46,
+      "no": null
+    },
+    {
+      "short": "淑",
+      "homeroom": "3C",
+      "seq": 47,
+      "no": null
     },
     {
       "short": "麗",
-      "homeroom": "4C/D"
+      "homeroom": "4C/D",
+      "seq": 48,
+      "no": null
     }
   ],
   "bellSchedules": {

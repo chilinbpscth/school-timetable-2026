@@ -82,6 +82,11 @@
     display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
     margin-bottom: 14px;
   }
+  .filters .actions {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+  }
   .filters label { font-size: 14px; color: var(--muted); }
   .filters select {
     font-family: inherit; font-size: 16px;
@@ -90,6 +95,21 @@
     border-radius: 4px;
     background: #fff;
     min-width: 160px;
+  }
+  .filters button {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .filters button:hover { background: #f7f2e7; }
+  .filters button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   table.grid {
@@ -135,8 +155,18 @@
     border-left: 4px solid #c6a161;
     padding: 10px 12px;
     font-size: 14px;
-    white-space: pre-wrap;
     line-height: 1.7;
+  }
+  .activities .title {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .activities ul {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+  .activities li {
+    margin: 3px 0;
   }
   .activities.empty { color: var(--muted); font-style: italic; }
 
@@ -155,6 +185,55 @@
   .class-matrix {
     overflow-x: auto;
   }
+  .matrix-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .matrix-controls .mode-btn {
+    font-family: inherit;
+    font-size: 14px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    cursor: pointer;
+  }
+  .matrix-controls .mode-btn.active {
+    background: #efe5d0;
+    border-color: #c8b087;
+    font-weight: 600;
+  }
+  .matrix-controls .period-pick,
+  .matrix-controls .class-pick {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .matrix-controls .period-pick select,
+  .matrix-controls .class-pick select {
+    min-width: 96px;
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+  .matrix-controls .class-pick select { min-width: 110px; }
+  .matrix-period table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .matrix-period th, .matrix-period td {
+    border: 1px solid var(--line);
+    padding: 6px 8px;
+  }
+  .matrix-period th {
+    background: #efeadc;
+    width: 100px;
+    text-align: center;
+  }
+  .matrix-period td.empty { color: var(--muted); }
   .class-matrix table {
     min-width: 700px;
   }
@@ -176,6 +255,67 @@
     font-size: 15px;
     min-width: 110px;
   }
+  .teacher-schedule-list {
+    display: grid;
+    gap: 8px;
+  }
+  .teacher-slot {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    padding: 8px 10px;
+    align-items: start;
+  }
+  .teacher-slot .k {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .teacher-slot .v {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .teacher-slot.empty .v { color: var(--muted); }
+  .teacher-duty-box {
+    margin-top: 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fcfaf4;
+    padding: 10px 12px;
+  }
+  .teacher-duty-box h3 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .teacher-duty-box ul {
+    margin: 0;
+    padding-left: 1.1em;
+    display: grid;
+    gap: 4px;
+  }
+  .teacher-extra {
+    margin-top: 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .teacher-extra summary {
+    cursor: pointer;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .teacher-extra ul {
+    margin: 0;
+    padding: 0 12px 10px 1.2em;
+    display: grid;
+    gap: 4px;
+  }
 
   .morning-duty .station-row td.location { text-align: left; }
   .morning-duty .station-row td.people { text-align: left; font-weight: 600; }
@@ -196,8 +336,69 @@
   }
   .duty-section table { min-width: 360px; width: auto; }
   .duty-section td.label { text-align: left; }
+  .duty-compact {
+    display: grid;
+    gap: 8px;
+  }
+  .duty-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fcfaf4;
+    overflow: hidden;
+  }
+  .duty-card summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 10px 12px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .duty-card summary::-webkit-details-marker { display: none; }
+  .duty-card[open] summary {
+    background: #f4eddc;
+    border-bottom: 1px solid var(--line);
+  }
+  .duty-card .meta {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .duty-list {
+    margin: 0;
+    padding: 8px 12px 10px;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+  }
+  .duty-list li {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 8px;
+    font-size: 14px;
+  }
+  .duty-list .k { color: var(--muted); }
+  .duty-list .v { font-weight: 600; }
 
   .no-data { color: var(--muted); font-style: italic; padding: 10px 0; }
+  .back-to-top {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 10px 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    font-size: 14px;
+    font-family: inherit;
+    cursor: pointer;
+    display: none;
+    z-index: 20;
+  }
+  .back-to-top.show { display: inline-flex; }
 
   @media print {
     header.appbar, nav.tabs { display: none; }
@@ -209,7 +410,15 @@
   @media (max-width: 640px) {
     main { padding: 10px; }
     .panel { padding: 12px; }
-    nav.tabs button { font-size: 13px; padding: 10px 4px; }
+    nav.tabs { overflow-x: auto; }
+    nav.tabs button {
+      font-size: 13px;
+      padding: 10px 8px;
+      flex: 0 0 auto;
+      min-width: 140px;
+    }
+    .teacher-slot { grid-template-columns: 1fr; gap: 4px; }
+    .duty-list li { grid-template-columns: 1fr; gap: 2px; }
     .day-banner .date { font-size: 18px; }
   }
 </style>
@@ -224,8 +433,6 @@
 <nav class="tabs" id="tabs">
   <button data-tab="day" class="active">📅 揀日子睇全日</button>
   <button data-tab="teacher">👤 揀老師</button>
-  <button data-tab="class">🏫 揀班別</button>
-  <button data-tab="morning">🌅 早上特別當值</button>
 </nav>
 
 <main>
@@ -236,14 +443,13 @@
       <div class="filters">
         <label>日期：</label>
         <select id="day-date"></select>
+        <div class="actions">
+          <button id="day-prev" type="button">← 上一日</button>
+          <button id="day-next" type="button">下一日 →</button>
+        </div>
       </div>
       <div id="day-banner"></div>
       <div id="day-activities"></div>
-    </div>
-
-    <div class="panel">
-      <h2>🔔 鐘聲時間表</h2>
-      <div id="day-bell"></div>
     </div>
 
     <div class="panel" id="day-morning-duty-panel">
@@ -258,7 +464,25 @@
 
     <div class="panel">
       <h2>📋 班別總表（22 班 × 每節）</h2>
+      <div class="matrix-controls">
+        <button id="matrix-mode-table" class="mode-btn active" type="button">總表</button>
+        <button id="matrix-mode-class" class="mode-btn" type="button">按班別</button>
+        <button id="matrix-mode-period" class="mode-btn" type="button">按節次</button>
+        <label class="class-pick" id="matrix-class-wrap">
+          <span>班別：</span>
+          <select id="matrix-class"></select>
+        </label>
+        <label class="period-pick" id="matrix-period-wrap">
+          <span>節次：</span>
+          <select id="matrix-period"></select>
+        </label>
+      </div>
       <div class="class-matrix" id="day-class-matrix"></div>
+    </div>
+
+    <div class="panel">
+      <h2>🔔 鐘聲時間表（參考）</h2>
+      <div id="day-bell"></div>
     </div>
   </section>
 
@@ -279,35 +503,8 @@
     </div>
   </section>
 
-  <!-- Tab: Class -->
-  <section class="tab-content" id="tab-class" hidden>
-    <div class="panel">
-      <div class="filters">
-        <label>日期：</label>
-        <select id="class-date"></select>
-        <label>班別：</label>
-        <select id="class-name"></select>
-      </div>
-      <div id="class-banner"></div>
-    </div>
-    <div class="panel">
-      <h2>🏫 班時間表</h2>
-      <div class="class-view" id="class-schedule"></div>
-    </div>
-  </section>
-
-  <!-- Tab: Morning duty -->
-  <section class="tab-content" id="tab-morning" hidden>
-    <div class="panel">
-      <div class="filters">
-        <label>日期：</label>
-        <select id="morning-date"></select>
-      </div>
-      <div id="morning-content" class="morning-duty"></div>
-    </div>
-  </section>
-
 </main>
+<button id="back-to-top" class="back-to-top" type="button">回到頂部 ↑</button>
 
 <script id="data" type="application/json">"__DATA_PLACEHOLDER__"</script>
 
@@ -337,12 +534,8 @@
   tabs.addEventListener('click', e => {
     const btn = e.target.closest('button[data-tab]');
     if (!btn) return;
-    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b===btn));
-    document.querySelectorAll('.tab-content').forEach(sec => {
-      const on = sec.id === 'tab-' + btn.dataset.tab;
-      sec.classList.toggle('active', on);
-      sec.hidden = !on;
-    });
+    switchTab(btn.dataset.tab);
+    persistState();
   });
 
   // ---- Populate selectors ----
@@ -358,33 +551,138 @@
 
   const dayDateSel = document.getElementById('day-date');
   const teacherDateSel = document.getElementById('teacher-date');
-  const classDateSel = document.getElementById('class-date');
-  const morningDateSel = document.getElementById('morning-date');
+  const dayPrevBtn = document.getElementById('day-prev');
+  const dayNextBtn = document.getElementById('day-next');
+  const backToTopBtn = document.getElementById('back-to-top');
+  const matrixModeTableBtn = document.getElementById('matrix-mode-table');
+  const matrixModeClassBtn = document.getElementById('matrix-mode-class');
+  const matrixModePeriodBtn = document.getElementById('matrix-mode-period');
+  const matrixClassSel = document.getElementById('matrix-class');
+  const matrixPeriodSel = document.getElementById('matrix-period');
+  const STORAGE_KEY = 'timetable-ui-state-v1';
+  const TABS = ['day', 'teacher'];
+  let currentTab = 'day';
+  let matrixMode = 'table';
+  let matrixClassPreferred = DATA.classes[0] || '';
+  let matrixPeriodPreferred = 'p1';
 
   fillDateSelect(dayDateSel, DATA.days);
   fillDateSelect(teacherDateSel, DATA.days);
-  fillDateSelect(classDateSel, DATA.days);
-  fillDateSelect(morningDateSel, DATA.days.filter(d => d.morningDuty));
-
   // Teacher dropdown
   const teacherSel = document.getElementById('teacher-name');
   DATA.teachers.forEach(t => {
     const o = document.createElement('option');
     o.value = t.short;
-    o.textContent = `${t.short}（${t.homeroom || '—'}）`;
+    const no = String(t.no || t.seq || '').padStart(2, '0');
+    o.textContent = `${no} ${t.short}`;
     teacherSel.appendChild(o);
   });
-
-  // Class dropdown
-  const classSel = document.getElementById('class-name');
   DATA.classes.forEach(c => {
     const o = document.createElement('option');
-    o.value = c; o.textContent = c;
-    classSel.appendChild(o);
+    o.value = c;
+    o.textContent = c;
+    matrixClassSel.appendChild(o);
   });
+
+  // ---- UI state persistence (URL + localStorage) ----
+  function safeReadStorage(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      return {};
+    }
+  }
+  function saveStorage(state){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (_) {}
+  }
+  function collectState(){
+    return {
+      tab: currentTab,
+      dayDate: dayDateSel.value,
+      teacherDate: teacherDateSel.value,
+      teacherName: teacherSel.value,
+      matrixMode,
+      matrixClass: matrixClassSel.value || matrixClassPreferred,
+      matrixPeriod: matrixPeriodSel.value || matrixPeriodPreferred,
+    };
+  }
+  function setSelectIfValid(sel, value){
+    if (!value) return;
+    const ok = Array.from(sel.options).some(o => o.value === value);
+    if (ok) sel.value = value;
+  }
+  function switchTab(tab){
+    currentTab = tab;
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.tab-content').forEach(sec => {
+      const on = sec.id === 'tab-' + tab;
+      sec.classList.toggle('active', on);
+      sec.hidden = !on;
+    });
+  }
+  function applyState(state){
+    if (!state || typeof state !== 'object') return;
+    setSelectIfValid(dayDateSel, state.dayDate);
+    setSelectIfValid(teacherDateSel, state.teacherDate);
+    setSelectIfValid(teacherSel, state.teacherName);
+    if (state.matrixClass) matrixClassPreferred = state.matrixClass;
+    if (state.matrixPeriod) matrixPeriodPreferred = state.matrixPeriod;
+    if (state.matrixMode === 'period' || state.matrixMode === 'table' || state.matrixMode === 'class') {
+      matrixMode = state.matrixMode;
+      syncMatrixModeUI();
+    }
+    if (TABS.includes(state.tab)) switchTab(state.tab);
+  }
+  function persistState(){
+    const state = collectState();
+    saveStorage(state);
+    const params = new URLSearchParams();
+    params.set('tab', state.tab);
+    params.set('dayDate', state.dayDate);
+    params.set('teacherDate', state.teacherDate);
+    params.set('teacherName', state.teacherName);
+    params.set('matrixMode', state.matrixMode);
+    params.set('matrixClass', state.matrixClass);
+    params.set('matrixPeriod', state.matrixPeriod);
+    history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+  }
+  function restoreInitialState(){
+    applyState(safeReadStorage());
+    const params = new URLSearchParams(location.search);
+    if (params.toString()) {
+      applyState({
+        tab: params.get('tab'),
+        dayDate: params.get('dayDate'),
+        teacherDate: params.get('teacherDate'),
+        teacherName: params.get('teacherName'),
+        matrixMode: params.get('matrixMode'),
+        matrixClass: params.get('matrixClass'),
+        matrixPeriod: params.get('matrixPeriod'),
+      });
+    }
+  }
+  function applyTodayDateDefaults(){
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const hasToday = DATA.days.some(d => d.date === todayIso);
+    if (!hasToday) return;
+    const params = new URLSearchParams(location.search);
+    if (!params.get('dayDate')) dayDateSel.value = todayIso;
+    if (!params.get('teacherDate')) teacherDateSel.value = todayIso;
+  }
 
   // ---- Helpers ----
   function findDay(iso){ return DATA.days.find(d => d.date === iso); }
+  function escapeRegExp(s){
+    return (s || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  function containsTeacher(text, short){
+    if (!text || !short) return false;
+    const p = new RegExp(`(^|[（(\\/、，\\s])${escapeRegExp(short)}($|[）)\\/、，\\s])`);
+    return p.test(text);
+  }
   function escapeHtml(s){
     return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   }
@@ -396,6 +694,36 @@
       <span class="badge ${cls}">${label}</span>
     </div>`;
   }
+  function renderActivities(text){
+    const lines = (text || '')
+      .split('\n')
+      .map(s => s.trim())
+      .filter(Boolean);
+    if (!lines.length) {
+      return '<div class="activities empty">當日活動：當日無特別活動。</div>';
+    }
+    function shouldAppend(prev, line){
+      if (!prev) return false;
+      if (/^[（(]/.test(line)) return true;
+      if (/^第\s*\d+組/.test(line) && /^-/.test(prev)) return true;
+      if (/^第\s*[0-9]+\s*節/.test(line) && /特別體育課|外語\(統籌/.test(prev)) return true;
+      if (/^第\s*[0-9]+\s*節/.test(line) && /第\s*[0-9]+\s*節/.test(prev) && /外語\(統籌/.test(prev)) return true;
+      if (/^[Pp]\d/.test(line) && /代課老師[:：]?$/.test(prev)) return true;
+      return false;
+    }
+    const grouped = [];
+    lines.forEach(line => {
+      const prevItem = grouped[grouped.length - 1];
+      const prevLast = prevItem ? prevItem[prevItem.length - 1] : '';
+      if (prevItem && shouldAppend(prevLast, line)) prevItem.push(line);
+      else grouped.push([line]);
+    });
+    const items = grouped.map(parts => {
+      const html = parts.map(p => escapeHtml(p)).join('<br>');
+      return `<li>${html}</li>`;
+    }).join('');
+    return `<div class="activities"><div class="title">當日活動</div><ul>${items}</ul></div>`;
+  }
 
   // ---- Render: Day overview ----
   function renderDay(){
@@ -405,10 +733,7 @@
 
     document.getElementById('day-banner').innerHTML = dayBanner(d);
 
-    const acts = (d.activities || '').trim();
-    document.getElementById('day-activities').innerHTML = acts
-      ? `<div class="activities">${escapeHtml(acts)}</div>`
-      : `<div class="activities empty">當日無特別活動。</div>`;
+    document.getElementById('day-activities').innerHTML = renderActivities(d.activities);
 
     // Bell schedule
     const bell = DATA.bellSchedules[d.type] || [];
@@ -427,15 +752,36 @@
     document.getElementById('day-duties').innerHTML = renderDuties(d.duties || {});
 
     // Class matrix
-    document.getElementById('day-class-matrix').innerHTML = renderClassMatrix(d);
+    syncMatrixClassOptions();
+    syncMatrixPeriodOptions(d);
+    document.getElementById('day-class-matrix').innerHTML =
+      matrixMode === 'period' ? renderClassByPeriod(d, matrixPeriodSel.value)
+        : (matrixMode === 'class' ? renderClassByClass(d, matrixClassSel.value) : renderClassMatrix(d));
+    syncDayNavButtons();
+  }
+
+  function syncDayNavButtons(){
+    const idx = DATA.days.findIndex(d => d.date === dayDateSel.value);
+    dayPrevBtn.disabled = idx <= 0;
+    dayNextBtn.disabled = idx < 0 || idx >= DATA.days.length - 1;
+  }
+
+  function moveDay(delta){
+    const idx = DATA.days.findIndex(d => d.date === dayDateSel.value);
+    if (idx < 0) return;
+    const next = idx + delta;
+    if (next < 0 || next >= DATA.days.length) return;
+    dayDateSel.value = DATA.days[next].date;
+    renderDay();
+    persistState();
   }
 
   function renderBell(bell){
     if (!bell.length) return '<div class="no-data">無資料</div>';
-    let h = '<table class="bell"><thead><tr><th>時間</th><th>堂</th><th>備註</th></tr></thead><tbody>';
+    let h = '<table class="bell"><thead><tr><th>時間</th><th>堂</th></tr></thead><tbody>';
     bell.forEach(b => {
       const isRecess = b.name && (b.name.includes('小息') || b.name === '午膳');
-      h += `<tr class="${isRecess?'recess':''}"><td>${escapeHtml(b.start)} – ${escapeHtml(b.end)}</td><td>${escapeHtml(b.name)}</td><td>${escapeHtml(b.note||'')}</td></tr>`;
+      h += `<tr class="${isRecess?'recess':''}"><td>${escapeHtml(b.start)} – ${escapeHtml(b.end)}</td><td>${escapeHtml(b.name)}</td></tr>`;
     });
     return h + '</tbody></table>';
   }
@@ -461,25 +807,24 @@
   function renderDuties(duties){
     const sections = [
       ['recess1', '小息一當值'],
+      ['recess1_half', '小息當值'],
       ['recess2', '小息二當值'],
       ['lunch_sup', '午膳當值（各班）'],
       ['lunch_recess', '午息當值'],
       ['dismissal', '放學當值'],
     ];
-    let html = '';
-    let any = false;
+    const cards = [];
     sections.forEach(([key, title]) => {
       const items = duties[key];
       if (!items || !items.length) return;
-      any = true;
-      html += `<div class="duty-section"><h3>${title}</h3>`;
-      html += '<table class="grid"><tbody>';
-      items.forEach(it => {
-        html += `<tr><td class="label">${escapeHtml(it.label || '—')}</td><td>${escapeHtml(it.value)}</td></tr>`;
-      });
-      html += '</tbody></table></div>';
+      const rows = items.map(it => (
+        `<li><span class="k">${escapeHtml(it.label || '—')}</span><span class="v">${escapeHtml(it.value)}</span></li>`
+      )).join('');
+      cards.push(
+        `<details class="duty-card"><summary><span>${title}</span><span class="meta">${items.length} 項</span></summary><ul class="duty-list">${rows}</ul></details>`
+      );
     });
-    return any ? html : '<div class="no-data">當日無其他當值資料</div>';
+    return cards.length ? `<div class="duty-compact">${cards.join('')}</div>` : '<div class="no-data">當日無其他當值資料</div>';
   }
 
   function renderClassMatrix(d){
@@ -497,6 +842,66 @@
       h += '</tr>';
     });
     return h + '</tbody></table>';
+  }
+
+  function renderClassByPeriod(d, periodKey){
+    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
+    const p = /^p\d+$/.test(periodKey || '') ? periodKey : 'p1';
+    let pNum = Number(p.slice(1));
+    if (!pNum || pNum < 1) pNum = 1;
+    if (pNum > nP) pNum = nP;
+    const key = `p${pNum}`;
+    let h = `<div class="matrix-period"><table><thead><tr><th>班別</th><th>第${pNum}節</th></tr></thead><tbody>`;
+    DATA.classes.forEach(c => {
+      const sched = d.classSchedules[c] || {};
+      const v = sched[key] || '';
+      h += `<tr><th>${escapeHtml(c)}</th><td class="${v?'':'empty'}">${escapeHtml(v) || '—'}</td></tr>`;
+    });
+    return h + '</tbody></table></div>';
+  }
+
+  function renderClassByClass(d, cls){
+    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
+    const className = DATA.classes.includes(cls) ? cls : (DATA.classes[0] || '');
+    const sched = d.classSchedules[className] || {};
+    let h = `<div class="matrix-period"><table><thead><tr><th>班別</th>`;
+    for (let i = 1; i <= nP; i++) h += `<th>第${i}節</th>`;
+    h += '</tr></thead><tbody>';
+    h += `<tr><th>${escapeHtml(className)}</th>`;
+    for (let i = 1; i <= nP; i++) {
+      const v = sched[`p${i}`] || '';
+      h += `<td class="${v ? '' : 'empty'}">${escapeHtml(v) || '—'}</td>`;
+    }
+    h += '</tr></tbody></table></div>';
+    return h;
+  }
+
+  function syncMatrixModeUI(){
+    matrixModeTableBtn.classList.toggle('active', matrixMode === 'table');
+    matrixModeClassBtn.classList.toggle('active', matrixMode === 'class');
+    matrixModePeriodBtn.classList.toggle('active', matrixMode === 'period');
+  }
+
+  function syncMatrixClassOptions(){
+    const current = matrixClassSel.value || matrixClassPreferred;
+    setSelectIfValid(matrixClassSel, current);
+    if (!matrixClassSel.value) matrixClassSel.value = DATA.classes[0] || '';
+    matrixClassPreferred = matrixClassSel.value;
+  }
+
+  function syncMatrixPeriodOptions(d){
+    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
+    const current = matrixPeriodSel.value || matrixPeriodPreferred;
+    matrixPeriodSel.innerHTML = '';
+    for (let i = 1; i <= nP; i++) {
+      const o = document.createElement('option');
+      o.value = `p${i}`;
+      o.textContent = `第${i}節`;
+      matrixPeriodSel.appendChild(o);
+    }
+    setSelectIfValid(matrixPeriodSel, current);
+    if (!matrixPeriodSel.value) matrixPeriodSel.value = 'p1';
+    matrixPeriodPreferred = matrixPeriodSel.value;
   }
 
   // ---- Render: Teacher view ----
@@ -520,103 +925,133 @@
     else order = SLOT_ORDER_FULL;
     const labels = d.type === 'half-day' ? SLOT_LABELS_HALF : SLOT_LABELS_FULL;
 
-    let h = '<table class="grid"><thead><tr>';
-    order.forEach(s => h += `<th>${labels[s]||s}</th>`);
-    h += '</tr></thead><tbody><tr>';
+    let h = '<div class="teacher-schedule-list">';
     order.forEach(s => {
       const v = (ts.slots||{})[s] || '';
-      const isRecess = s === 'recess1' || s === 'recess2' || s === 'lunch';
-      const isDuty = s === 'duty';
-      const cls = isRecess ? 'recess' : (isDuty ? 'duty' : '') + (v ? '' : ' empty');
-      h += `<td class="${cls.trim()}">${escapeHtml(v) || '—'}</td>`;
+      const cls = v ? 'teacher-slot' : 'teacher-slot empty';
+      h += `<div class="${cls}"><div class="k">${escapeHtml(labels[s]||s)}</div><div class="v">${escapeHtml(v) || '—'}</div></div>`;
     });
-    h += '</tr></tbody></table>';
-
-    // Add cross-references: lessons by class (from classSchedules)
-    h += '<div style="margin-top:18px; font-size:14px; color:var(--muted);">';
-    h += '從班總表交叉檢查（顯示由老師單名出現喺邊個班嘅邊節）：';
     h += '</div>';
-    h += '<table class="grid" style="margin-top:6px;">';
-    h += '<thead><tr><th>班</th>';
+
+    const dutyItems = [];
+    if (d.morningDuty && d.morningDuty.stations) {
+      d.morningDuty.stations.forEach(s => {
+        if (containsTeacher(s.people, short)) {
+          dutyItems.push(`早上特別當值：${s.time}｜${s.location}｜${s.people}`);
+        }
+      });
+    }
+    const dutySections = [
+      ['recess1', '小息一當值'],
+      ['recess1_half', '小息當值'],
+      ['recess2', '小息二當值'],
+      ['lunch_sup', '午膳當值'],
+      ['lunch_recess', '午息當值'],
+      ['dismissal', '放學當值'],
+    ];
+    dutySections.forEach(([key, title]) => {
+      (d.duties?.[key] || []).forEach(it => {
+        if (containsTeacher(it.value, short)) {
+          const head = it.label ? `${it.label}｜` : '';
+          dutyItems.push(`${title}：${head}${it.value}`);
+        }
+      });
+    });
+    if (dutyItems.length) {
+      h += '<div class="teacher-duty-box"><h3>🛡️ 當日當值</h3><ul>';
+      dutyItems.forEach(it => h += `<li>${escapeHtml(it)}</li>`);
+      h += '</ul></div>';
+    }
+
+    // Compact class cross references
     const nP = d.periodCount || 6;
-    for (let i=1;i<=nP;i++) h += `<th>第${i}節</th>`;
-    h += '</tr></thead><tbody>';
-    let hasMatches = false;
+    const classRefs = [];
     DATA.classes.forEach(c => {
       const sched = d.classSchedules[c] || {};
-      const cells = [];
-      let rowHasMatch = false;
       for (let i=1;i<=nP;i++) {
         const v = sched['p'+i] || '';
-        const matches = v.includes(`(${short})`) || v.includes(`/${short})`) || v.includes(`(${short}/`);
-        if (matches) rowHasMatch = true;
-        cells.push({v, matches});
-      }
-      if (rowHasMatch) {
-        hasMatches = true;
-        h += `<tr><td class="cls">${escapeHtml(c)}</td>`;
-        cells.forEach(({v, matches}) => {
-          h += `<td class="${matches ? 'highlight' : (v?'':'empty')}">${escapeHtml(v) || '—'}</td>`;
-        });
-        h += '</tr>';
+        if (containsTeacher(v, short)) {
+          classRefs.push(`第${i}節｜${c}｜${v}`);
+        }
       }
     });
-    if (!hasMatches) h += `<tr><td colspan="${nP+1}" style="color:var(--muted);font-style:italic;">無</td></tr>`;
-    h += '</tbody></table>';
+    h += `<details class="teacher-extra"><summary>📌 班別對照（${classRefs.length} 項）</summary>`;
+    if (classRefs.length) {
+      h += '<ul>';
+      classRefs.forEach(it => h += `<li>${escapeHtml(it)}</li>`);
+      h += '</ul>';
+    } else {
+      h += '<div class="no-data" style="padding:0 12px 10px;">無</div>';
+    }
+    h += '</details>';
 
     document.getElementById('teacher-schedule').innerHTML = h;
-  }
-
-  // ---- Render: Class view ----
-  function renderClass(){
-    const iso = classDateSel.value;
-    const cls = classSel.value;
-    const d = findDay(iso);
-    if (!d) return;
-    document.getElementById('class-banner').innerHTML = dayBanner(d) +
-      `<div style="margin-top:8px;font-size:15px;">班別：<strong>${escapeHtml(cls)}</strong></div>`;
-    const sched = (d.classSchedules || {})[cls];
-    if (!sched) {
-      document.getElementById('class-schedule').innerHTML = '<div class="no-data">當日無此班資料</div>';
-      return;
-    }
-    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
-    let h = '<table class="grid"><thead><tr>';
-    for (let i=1;i<=nP;i++) h += `<th>第${i}節</th>`;
-    h += '</tr></thead><tbody><tr>';
-    for (let i=1;i<=nP;i++) {
-      const v = sched['p'+i] || '';
-      h += `<td class="${v?'':'empty'}">${escapeHtml(v) || '—'}</td>`;
-    }
-    h += '</tr></tbody></table>';
-    document.getElementById('class-schedule').innerHTML = h;
-  }
-
-  // ---- Render: Morning duty tab ----
-  function renderMorningTab(){
-    const iso = morningDateSel.value;
-    const d = findDay(iso);
-    if (!d || !d.morningDuty) {
-      document.getElementById('morning-content').innerHTML = '<div class="no-data">當日無早上特別當值</div>';
-      return;
-    }
-    document.getElementById('morning-content').innerHTML =
-      dayBanner(d) + renderMorningDuty(d.morningDuty);
   }
 
   // ---- Wire events ----
   dayDateSel.addEventListener('change', renderDay);
   teacherDateSel.addEventListener('change', renderTeacher);
   teacherSel.addEventListener('change', renderTeacher);
-  classDateSel.addEventListener('change', renderClass);
-  classSel.addEventListener('change', renderClass);
-  morningDateSel.addEventListener('change', renderMorningTab);
+  dayPrevBtn.addEventListener('click', () => moveDay(-1));
+  dayNextBtn.addEventListener('click', () => moveDay(1));
+  matrixModeTableBtn.addEventListener('click', () => {
+    matrixMode = 'table';
+    syncMatrixModeUI();
+    renderDay();
+    persistState();
+  });
+  matrixModeClassBtn.addEventListener('click', () => {
+    matrixMode = 'class';
+    syncMatrixModeUI();
+    renderDay();
+    persistState();
+  });
+  matrixModePeriodBtn.addEventListener('click', () => {
+    matrixMode = 'period';
+    syncMatrixModeUI();
+    renderDay();
+    persistState();
+  });
+  matrixClassSel.addEventListener('change', () => {
+    matrixClassPreferred = matrixClassSel.value;
+    matrixMode = 'class';
+    syncMatrixModeUI();
+    renderDay();
+    persistState();
+  });
+  matrixPeriodSel.addEventListener('change', () => {
+    matrixPeriodPreferred = matrixPeriodSel.value;
+    matrixMode = 'period';
+    syncMatrixModeUI();
+    renderDay();
+    persistState();
+  });
+  [dayDateSel, teacherDateSel, teacherSel]
+    .forEach(el => el.addEventListener('change', persistState));
+  window.addEventListener('scroll', () => {
+    backToTopBtn.classList.toggle('show', window.scrollY > 280);
+  }, { passive: true });
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.target && ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
+    if (e.key === '[') moveDay(-1);
+    if (e.key === ']') moveDay(1);
+    if (e.altKey && ['1','2'].includes(e.key)) {
+      const tab = TABS[Number(e.key) - 1];
+      switchTab(tab);
+      persistState();
+    }
+  });
 
   // Initial render
+  syncMatrixModeUI();
+  restoreInitialState();
+  applyTodayDateDefaults();
   renderDay();
   renderTeacher();
-  renderClass();
-  renderMorningTab();
+  persistState();
 })();
 </script>
 </body>

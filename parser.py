@@ -6,6 +6,7 @@ Run once to seed; after that, data.json is maintained by hand.
 from __future__ import annotations
 import json
 import re
+import subprocess
 import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -21,6 +22,7 @@ FILES = {
     "T154": "T154_25-26_六至七月整體課堂安排(D)(T154_25_26).docx",
 }
 OUT = Path(__file__).parent / "data.json"
+SIGNIN_DOC = Path("/Volumes/PublicFolders/2025-2026/2校務處/m教職員資料/2025-2026_教師簽到紀錄.doc")
 
 YEAR = 2026
 CLASSES = ["1A","1B","1C","2A","2B","2C","3A","3B","3C",
@@ -319,6 +321,55 @@ def _ingest_duty_table(table, section, target):
             })
 
 
+def parse_signin_teacher_numbers(doc_path: Path):
+    """Parse NO + full name from the school sign-in .doc file."""
+    if not doc_path.exists():
+        return []
+    try:
+        out = subprocess.check_output(
+            ["textutil", "-convert", "txt", "-stdout", str(doc_path)],
+            stderr=subprocess.STDOUT,
+        )
+    except Exception:
+        return []
+
+    text = out.decode("utf-8", "ignore")
+    tokens = [t.strip() for t in re.split(r"[\x07\r\n]+", text) if t.strip()]
+    skip_names = {"NO", "教師姓名", "簡簽", "到校時間", "離校時間", "備註"}
+    numbered = {}
+    i = 0
+    while i + 1 < len(tokens):
+        no_txt = tokens[i]
+        name = tokens[i + 1]
+        if re.fullmatch(r"\d{1,3}", no_txt):
+            no = int(no_txt)
+            if (
+                1 <= no <= 99
+                and name not in skip_names
+                and "MERGEFIELD" not in name
+                and re.search(r"[\u4e00-\u9fffA-Za-z]", name)
+            ):
+                numbered.setdefault(no, name)
+            i += 2
+        else:
+            i += 1
+    return sorted(numbered.items())
+
+
+def map_teacher_numbers(teacher_order, numbered_names):
+    """Map short codes to sign-in NO using order-aware greedy matching."""
+    short_to_no = {}
+    used = set()
+    for no, full_name in numbered_names:
+        candidates = [s for s in teacher_order if s not in used and s in full_name]
+        if not candidates:
+            continue
+        chosen = candidates[0]
+        short_to_no[chosen] = no
+        used.add(chosen)
+    return short_to_no
+
+
 # ---------- T153 parser (class -> per-period) ----------
 
 def parse_t153(blocks):
@@ -492,7 +543,17 @@ def build():
             if short not in teacher_set:
                 teacher_set[short] = slots.get('homeroom', '').strip()
 
-    teachers = [{'short': s, 'homeroom': h} for s, h in sorted(teacher_set.items())]
+    teacher_order = list(teacher_set.keys())
+    numbered_names = parse_signin_teacher_numbers(SIGNIN_DOC)
+    short_to_no = map_teacher_numbers(teacher_order, numbered_names)
+    teachers = []
+    for idx, (s, h) in enumerate(teacher_set.items(), start=1):
+        teachers.append({
+            'short': s,
+            'homeroom': h,
+            'seq': idx,
+            'no': short_to_no.get(s),
+        })
 
     # Build days
     all_iso = set(t151.keys()) | set(t152.keys()) | set(t153.keys())
