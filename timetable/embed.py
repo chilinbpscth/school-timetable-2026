@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 from pathlib import Path
@@ -7,8 +8,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 INDEX = ROOT / "index.html"
 DATA = ROOT / "data.json"
-TEMPLATE = ROOT / "template.html"
 BUILD = ROOT / "build.py"
+
+BOOT_KEYS = (
+    "tab",
+    "dayDate",
+    "teacherDate",
+    "teacherName",
+    "matrixMode",
+    "matrixClass",
+    "matrixPeriod",
+)
 
 
 def ensure_index_html() -> None:
@@ -20,44 +30,34 @@ def ensure_index_html() -> None:
         subprocess.run(["python3", str(BUILD)], cwd=ROOT, check=True)
 
 
-def strip_cloud_chat(html: str) -> str:
-    """Remove in-page chat (uses /api/chat); Streamlit uses sidebar + secrets instead."""
-    fab = html.find('<button id="chat-fab"')
-    data_script = html.find('<script id="data"')
-    if fab != -1 and data_script != -1:
-        html = html[:fab] + html[data_script:]
-
-    css_start = html.find("/* ---- AI Chatbot ---- */")
-    if css_start != -1:
-        mobile = html.find("  @media (max-width: 640px) {\n    .chat-panel", css_start)
-        if mobile != -1:
-            css_end = html.find("\n  }\n", mobile)
-            if css_end != -1:
-                css_end += len("\n  }\n")
-                html = html[:css_start] + html[css_end:]
-        else:
-            css_end = html.find("body.chat-open .back-to-top", css_start)
-            if css_end != -1:
-                line_end = html.find("\n", css_end)
-                if line_end != -1:
-                    html = html[:css_start] + html[line_end + 1 :]
-
-    js_markers = [
-        "  // ---- AI Chatbot (DeepSeek V4 via Firebase /api/chat) ----",
-        "  // ---- AI Chatbot",
-    ]
-    for marker in js_markers:
-        js_start = html.find(marker)
-        if js_start != -1:
-            js_end = html.find("  // Initial render", js_start)
-            if js_end != -1:
-                html = html[:js_start] + html[js_end:]
-            break
-
-    return html
+def pick_boot_params(query: dict | None) -> dict[str, str]:
+    if not query:
+        return {}
+    out: dict[str, str] = {}
+    for key in BOOT_KEYS:
+        val = query.get(key)
+        if val is None:
+            continue
+        if isinstance(val, list):
+            val = val[0] if val else ""
+        out[key] = str(val).strip()
+    return out
 
 
-def load_ui_html() -> str:
+def inject_streamlit_boot(html: str, boot: dict[str, str]) -> str:
+    if not boot:
+        return html
+    payload = json.dumps(boot, ensure_ascii=False)
+    snippet = (
+        f'<script id="streamlit-boot">window.__STREAMLIT_BOOT__ = {payload};</script>\n'
+    )
+    marker = '<script id="data" type="application/json">'
+    if marker not in html:
+        raise ValueError("Cannot inject Streamlit boot params into timetable HTML")
+    return html.replace(marker, snippet + marker, 1)
+
+
+def load_ui_html(query: dict | None = None) -> str:
     ensure_index_html()
     html = INDEX.read_text(encoding="utf-8")
-    return strip_cloud_chat(html)
+    return inject_streamlit_boot(html, pick_boot_params(query))

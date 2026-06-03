@@ -651,6 +651,19 @@
   }
   function restoreInitialState(){
     applyState(safeReadStorage());
+    const boot = window.__STREAMLIT_BOOT__;
+    if (boot && typeof boot === 'object') {
+      applyState({
+        tab: boot.tab,
+        dayDate: boot.dayDate,
+        teacherDate: boot.teacherDate,
+        teacherName: boot.teacherName,
+        matrixMode: boot.matrixMode,
+        matrixClass: boot.matrixClass,
+        matrixPeriod: boot.matrixPeriod,
+      });
+      return;
+    }
     const params = new URLSearchParams(location.search);
     if (params.toString()) {
       applyState({
