@@ -18,6 +18,9 @@ BOOT_KEYS = (
     "matrixMode",
     "matrixClass",
     "matrixPeriod",
+    "aiMode",
+    "aiReply",
+    "aiReplyId",
 )
 
 
@@ -57,7 +60,16 @@ def inject_streamlit_boot(html: str, boot: dict[str, str]) -> str:
     return html.replace(marker, snippet + marker, 1)
 
 
-def load_ui_html(query: dict | None = None) -> str:
+def load_ui_html(
+    query: dict | None = None,
+    *,
+    ai_reply: dict[str, str] | None = None,
+) -> str:
     ensure_index_html()
     html = INDEX.read_text(encoding="utf-8")
-    return inject_streamlit_boot(html, pick_boot_params(query))
+    boot = pick_boot_params(query)
+    boot["aiMode"] = "streamlit"
+    if ai_reply:
+        boot["aiReply"] = ai_reply.get("text", "")
+        boot["aiReplyId"] = ai_reply.get("requestId", "")
+    return inject_streamlit_boot(html, boot)
