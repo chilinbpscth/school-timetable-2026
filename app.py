@@ -21,8 +21,21 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-  #MainMenu, footer, header[data-testid="stHeader"] { visibility: hidden; height: 0; }
+  #MainMenu, footer { visibility: hidden; height: 0; }
+  header[data-testid="stHeader"],
+  [data-testid="stToolbar"],
+  [data-testid="stDecoration"],
+  div[data-testid="stStatusWidget"] {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
   [data-testid="stSidebar"] { display: none !important; }
+  .stApp { margin-top: 0 !important; }
+  section[data-testid="stMain"] {
+    padding-top: 0 !important;
+  }
   div[data-testid="stMain"] > div.block-container {
     padding: 0 !important;
     max-width: 100% !important;
@@ -92,4 +105,4 @@ except Exception as e:
     st.error(f"無法載入課表 UI：{e}")
     st.stop()
 
-components.html(ui_html, height=1400, scrolling=True)
+components.html(ui_html, height=1200, scrolling=False)

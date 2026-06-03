@@ -29,15 +29,43 @@
   header.appbar {
     background: var(--accent);
     color: #fff;
-    padding: 14px 20px;
+    padding: 12px 16px;
     border-bottom: 3px solid #861f17;
   }
+  .appbar-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+  .appbar-titles { min-width: 0; flex: 1; }
   header.appbar h1 {
     margin: 0; font-size: 20px; font-weight: 600;
   }
   header.appbar .sub {
     font-size: 13px; opacity: 0.9; margin-top: 2px;
   }
+  .appbar-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    align-items: center;
+  }
+  .appbar-actions button {
+    font-family: inherit;
+    font-size: 13px;
+    padding: 7px 12px;
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 6px;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .appbar-actions button:hover { background: rgba(255,255,255,0.22); }
+  .appbar-actions button.copied { background: #2d6a4f; border-color: #2d6a4f; }
   nav.tabs {
     display: flex; gap: 0;
     background: #efeadc;
@@ -56,6 +84,10 @@
     font-family: inherit;
   }
   nav.tabs button:last-child { border-right: none; }
+  nav.tabs button.tab-ai {
+    flex: 0 0 auto;
+    min-width: 118px;
+  }
   nav.tabs button.active {
     background: var(--panel);
     border-bottom: 3px solid var(--accent);
@@ -422,52 +454,23 @@
     .day-banner .date { font-size: 18px; }
   }
 
-  /* ---- AI 查詢（浮動，與主 UI 隔離）---- */
-  .chat-fab {
-    position: fixed;
-    right: 18px;
-    bottom: 18px;
-    z-index: 30;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    border: 2px solid #861f17;
-    background: var(--accent);
-    color: #fff;
-    font-size: 22px;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .chat-fab:hover { filter: brightness(1.05); }
-  .chat-panel {
-    position: fixed;
-    right: 18px;
-    bottom: 80px;
-    z-index: 31;
-    width: min(420px, calc(100vw - 24px));
-    max-height: min(72vh, 640px);
-    display: none;
+  /* ---- AI 查詢（第三個分頁，與課表 UI 同列）---- */
+  .ai-tab-panel {
+    display: flex;
     flex-direction: column;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.16);
-    overflow: hidden;
+    min-height: 420px;
+    max-height: min(72vh, 680px);
   }
-  .chat-panel.open { display: flex; }
   .chat-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 10px 12px;
-    background: var(--accent-soft);
-    border-bottom: 1px solid var(--line);
+    padding: 0 0 10px 0;
+    margin-bottom: 10px;
+    border-bottom: 2px solid var(--accent-soft);
   }
-  .chat-head h3 { margin: 0; font-size: 15px; }
+  .chat-head h3 { margin: 0; font-size: 17px; }
   .chat-head-actions { display: flex; gap: 6px; }
   .chat-head-actions button {
     font-family: inherit;
@@ -585,23 +588,31 @@
     cursor: pointer;
   }
   .chat-compose button:disabled { opacity: 0.5; cursor: not-allowed; }
-  body.chat-open .back-to-top { bottom: 86px; }
   @media (max-width: 640px) {
-    .chat-panel { right: 12px; bottom: 74px; }
-    .chat-fab { right: 12px; bottom: 12px; }
+    .appbar-inner { flex-direction: column; align-items: stretch; }
+    .appbar-actions { justify-content: flex-end; }
+    nav.tabs button.tab-ai { min-width: 100px; font-size: 13px; }
   }
 </style>
 </head>
 <body>
 
 <header class="appbar">
-  <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
-  <div class="sub" id="meta-sub"></div>
+  <div class="appbar-inner">
+    <div class="appbar-titles">
+      <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
+      <div class="sub" id="meta-sub"></div>
+    </div>
+    <div class="appbar-actions">
+      <button id="share-link-btn" type="button" title="複製目前畫面嘅分享連結">🔗 分享連結</button>
+    </div>
+  </div>
 </header>
 
 <nav class="tabs" id="tabs">
   <button data-tab="day" class="active">📅 揀日子睇全日</button>
   <button data-tab="teacher">👤 揀老師</button>
+  <button data-tab="ai" class="tab-ai">🤖 AI 查詢</button>
 </nav>
 
 <main>
@@ -672,38 +683,39 @@
     </div>
   </section>
 
+  <!-- Tab: AI -->
+  <section class="tab-content" id="tab-ai" hidden>
+    <div class="panel ai-tab-panel" role="region" aria-label="AI 時間表助手">
+      <div class="chat-head">
+        <h2 style="margin:0;border:none;padding:0;">🤖 AI 查時間表</h2>
+        <div class="chat-head-actions">
+          <button id="chat-settings-toggle" type="button">說明</button>
+        </div>
+      </div>
+      <div id="chat-settings" class="chat-settings">
+        <label id="chat-model-wrap">模型
+          <select id="chat-model">
+            <option value="deepseek-v4-flash" selected>deepseek-v4-flash（快）</option>
+            <option value="deepseek-v4-pro">deepseek-v4-pro（準）</option>
+          </select>
+        </label>
+        <p class="hint" id="chat-hint"></p>
+      </div>
+      <div id="chat-messages" class="chat-messages"></div>
+      <div class="chat-suggestions" id="chat-suggestions">
+        <button type="button" data-q="今日 1A 第3節上咩？">1A 第3節</button>
+        <button type="button" data-q="李老師今日行程">李老師今日</button>
+        <button type="button" data-q="6月16日有咩特別活動？">6/16 活動</button>
+      </div>
+      <div class="chat-compose">
+        <textarea id="chat-input" rows="2" placeholder="用中文問時間表，例如：符老師下星期三第2節…"></textarea>
+        <button id="chat-send" type="button">送出</button>
+      </div>
+    </div>
+  </section>
+
 </main>
 <button id="back-to-top" class="back-to-top" type="button">回到頂部 ↑</button>
-
-<button id="chat-fab" class="chat-fab" type="button" title="AI 查時間表">💬</button>
-<div id="chat-panel" class="chat-panel" role="dialog" aria-label="AI 時間表助手">
-  <div class="chat-head">
-    <h3>🤖 AI 查時間表</h3>
-    <div class="chat-head-actions">
-      <button id="chat-settings-toggle" type="button">說明</button>
-      <button id="chat-close" type="button">關閉</button>
-    </div>
-  </div>
-  <div id="chat-settings" class="chat-settings">
-    <label id="chat-model-wrap">模型
-      <select id="chat-model">
-        <option value="deepseek-v4-flash" selected>deepseek-v4-flash（快）</option>
-        <option value="deepseek-v4-pro">deepseek-v4-pro（準）</option>
-      </select>
-    </label>
-    <p class="hint" id="chat-hint"></p>
-  </div>
-  <div id="chat-messages" class="chat-messages"></div>
-  <div class="chat-suggestions" id="chat-suggestions">
-    <button type="button" data-q="今日 1A 第3節上咩？">1A 第3節</button>
-    <button type="button" data-q="李老師今日行程">李老師今日</button>
-    <button type="button" data-q="6月16日有咩特別活動？">6/16 活動</button>
-  </div>
-  <div class="chat-compose">
-    <textarea id="chat-input" rows="2" placeholder="用中文問時間表，例如：符老師下星期三第2節…"></textarea>
-    <button id="chat-send" type="button">送出</button>
-  </div>
-</div>
 
 <script id="data" type="application/json">"__DATA_PLACEHOLDER__"</script>
 
@@ -759,7 +771,8 @@
   const matrixClassSel = document.getElementById('matrix-class');
   const matrixPeriodSel = document.getElementById('matrix-period');
   const STORAGE_KEY = 'timetable-ui-state-v1';
-  const TABS = ['day', 'teacher'];
+  const TABS = ['day', 'teacher', 'ai'];
+  const shareLinkBtn = document.getElementById('share-link-btn');
   let currentTab = 'day';
   let matrixMode = 'table';
   let matrixClassPreferred = DATA.classes[0] || '';
@@ -835,6 +848,24 @@
     }
     if (TABS.includes(state.tab)) switchTab(state.tab);
   }
+  function buildShareUrl(){
+    const state = collectState();
+    const params = new URLSearchParams();
+    params.set('tab', state.tab);
+    params.set('dayDate', state.dayDate);
+    params.set('teacherDate', state.teacherDate);
+    params.set('teacherName', state.teacherName);
+    params.set('matrixMode', state.matrixMode);
+    params.set('matrixClass', state.matrixClass);
+    params.set('matrixPeriod', state.matrixPeriod);
+    let base = location.origin + location.pathname;
+    try {
+      if (window.parent !== window) {
+        base = window.parent.location.origin + window.parent.location.pathname;
+      }
+    } catch (_) {}
+    return `${base}?${params.toString()}`;
+  }
   function persistState(){
     const state = collectState();
     saveStorage(state);
@@ -847,6 +878,23 @@
     params.set('matrixClass', state.matrixClass);
     params.set('matrixPeriod', state.matrixPeriod);
     history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+  }
+  if (shareLinkBtn) {
+    shareLinkBtn.addEventListener('click', async () => {
+      const url = buildShareUrl();
+      try {
+        await navigator.clipboard.writeText(url);
+        const prev = shareLinkBtn.textContent;
+        shareLinkBtn.textContent = '✓ 已複製';
+        shareLinkBtn.classList.add('copied');
+        setTimeout(() => {
+          shareLinkBtn.textContent = prev;
+          shareLinkBtn.classList.remove('copied');
+        }, 2000);
+      } catch (_) {
+        window.prompt('複製此連結：', url);
+      }
+    });
   }
   function restoreInitialState(){
     applyState(safeReadStorage());
@@ -1277,10 +1325,11 @@
     if (e.target && ['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) return;
     if (e.key === '[') moveDay(-1);
     if (e.key === ']') moveDay(1);
-    if (e.altKey && ['1','2'].includes(e.key)) {
+    if (e.altKey && ['1','2','3'].includes(e.key)) {
       const tab = TABS[Number(e.key) - 1];
       switchTab(tab);
       persistState();
+      if (tab === 'ai') chatInput.focus();
     }
   });
 
@@ -1294,9 +1343,6 @@
     (location.hostname.includes('web.app') || location.hostname.includes('firebaseapp.com'))
       ? 'proxy' : (window.parent !== window ? 'streamlit' : 'static')
   );
-  const chatFab = document.getElementById('chat-fab');
-  const chatPanel = document.getElementById('chat-panel');
-  const chatClose = document.getElementById('chat-close');
   const chatSettingsToggle = document.getElementById('chat-settings-toggle');
   const chatSettings = document.getElementById('chat-settings');
   const chatModelWrap = document.getElementById('chat-model-wrap');
@@ -1309,14 +1355,10 @@
   let chatHistory = [];
   let chatBusy = false;
 
-  function openChat(){
-    chatPanel.classList.add('open');
-    document.body.classList.add('chat-open');
+  function openChatTab(){
+    switchTab('ai');
+    persistState();
     chatInput.focus();
-  }
-  function closeChat(){
-    chatPanel.classList.remove('open');
-    document.body.classList.remove('chat-open');
   }
   function loadChatPrefs(){
     try {
@@ -1653,11 +1695,10 @@
     }
   }
 
-  chatFab.addEventListener('click', () => {
-    if (chatPanel.classList.contains('open')) closeChat();
-    else openChat();
+  tabs.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-tab]');
+    if (btn && btn.dataset.tab === 'ai') setTimeout(() => chatInput.focus(), 0);
   });
-  chatClose.addEventListener('click', closeChat);
   chatSettingsToggle.addEventListener('click', () => {
     chatSettings.classList.toggle('open');
   });
