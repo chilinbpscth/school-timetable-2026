@@ -754,16 +754,6 @@
   const STORAGE_KEY = 'timetable-ui-state-v1';
   const TABS = ['day', 'teacher', 'ai'];
   const shareLinkBtn = document.getElementById('share-link-btn');
-
-  function reportEmbedHeight(){
-    const h = Math.max(
-      document.documentElement.scrollHeight,
-      document.body.scrollHeight
-    );
-    try {
-      window.parent.postMessage({ type: 'timetable-resize', height: h }, '*');
-    } catch (_) {}
-  }
   let currentTab = 'day';
   let matrixMode = 'table';
   let matrixClassPreferred = DATA.classes[0] || '';
@@ -825,7 +815,6 @@
       sec.classList.toggle('active', on);
       sec.hidden = !on;
     });
-    setTimeout(reportEmbedHeight, 0);
   }
   function applyState(state){
     if (!state || typeof state !== 'object') return;
@@ -1010,7 +999,6 @@
       matrixMode === 'period' ? renderClassByPeriod(d, matrixPeriodSel.value)
         : (matrixMode === 'class' ? renderClassByClass(d, matrixClassSel.value) : renderClassMatrix(d));
     syncDayNavButtons();
-    setTimeout(reportEmbedHeight, 0);
   }
 
   function syncDayNavButtons(){
@@ -1266,7 +1254,6 @@
     h += '</details>';
 
     document.getElementById('teacher-schedule').innerHTML = h;
-    setTimeout(reportEmbedHeight, 0);
   }
 
   // ---- Wire events ----
@@ -1724,8 +1711,6 @@
   renderDay();
   renderTeacher();
   persistState();
-  setTimeout(reportEmbedHeight, 100);
-  window.addEventListener('resize', reportEmbedHeight);
 })();
 </script>
 </body>
