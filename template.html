@@ -27,20 +27,13 @@
     line-height: 1.5;
   }
   header.appbar {
+    position: relative;
     background: var(--accent);
     color: #fff;
-    padding: 12px 16px;
+    padding: 14px 20px;
+    padding-right: 132px;
     border-bottom: 3px solid #861f17;
   }
-  .appbar-inner {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    max-width: 1300px;
-    margin: 0 auto;
-  }
-  .appbar-titles { min-width: 0; flex: 1; }
   header.appbar h1 {
     margin: 0; font-size: 20px; font-weight: 600;
   }
@@ -48,15 +41,15 @@
     font-size: 13px; opacity: 0.9; margin-top: 2px;
   }
   .appbar-actions {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-    align-items: center;
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
   }
   .appbar-actions button {
     font-family: inherit;
     font-size: 13px;
-    padding: 7px 12px;
+    padding: 6px 11px;
     border: 1px solid rgba(255,255,255,0.55);
     border-radius: 6px;
     background: rgba(255,255,255,0.12);
@@ -84,10 +77,6 @@
     font-family: inherit;
   }
   nav.tabs button:last-child { border-right: none; }
-  nav.tabs button.tab-ai {
-    flex: 0 0 auto;
-    min-width: 118px;
-  }
   nav.tabs button.active {
     background: var(--panel);
     border-bottom: 3px solid var(--accent);
@@ -454,24 +443,14 @@
     .day-banner .date { font-size: 18px; }
   }
 
-  /* ---- AI 查詢（第三個分頁，與課表 UI 同列）---- */
-  .ai-tab-panel {
-    display: flex;
-    flex-direction: column;
-    min-height: 420px;
-    max-height: min(72vh, 680px);
-  }
-  .chat-head {
+  /* ---- AI 查詢（第三個分頁）---- */
+  .panel-ai h2 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    padding: 0 0 10px 0;
-    margin-bottom: 10px;
-    border-bottom: 2px solid var(--accent-soft);
+    gap: 10px;
   }
-  .chat-head h3 { margin: 0; font-size: 17px; }
-  .chat-head-actions { display: flex; gap: 6px; }
+  .chat-head-actions { display: flex; gap: 6px; flex-shrink: 0; }
   .chat-head-actions button {
     font-family: inherit;
     font-size: 12px;
@@ -506,13 +485,17 @@
     line-height: 1.4;
   }
   .chat-messages {
-    flex: 1;
     overflow-y: auto;
     padding: 12px;
+    margin-bottom: 10px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-height: 200px;
+    min-height: 240px;
+    max-height: 420px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #faf8f3;
   }
   .chat-msg {
     max-width: 92%;
@@ -545,7 +528,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    padding: 0 12px 8px;
+    margin-bottom: 10px;
   }
   .chat-suggestions button {
     font-family: inherit;
@@ -561,9 +544,7 @@
   .chat-compose {
     display: flex;
     gap: 8px;
-    padding: 10px 12px;
-    border-top: 1px solid var(--line);
-    background: #faf8f3;
+    align-items: flex-end;
   }
   .chat-compose textarea {
     flex: 1;
@@ -589,30 +570,30 @@
   }
   .chat-compose button:disabled { opacity: 0.5; cursor: not-allowed; }
   @media (max-width: 640px) {
-    .appbar-inner { flex-direction: column; align-items: stretch; }
-    .appbar-actions { justify-content: flex-end; }
-    nav.tabs button.tab-ai { min-width: 100px; font-size: 13px; }
+    header.appbar { padding-right: 20px; padding-bottom: 46px; }
+    .appbar-actions {
+      top: auto;
+      bottom: 10px;
+      right: 12px;
+      transform: none;
+    }
   }
 </style>
 </head>
 <body>
 
 <header class="appbar">
-  <div class="appbar-inner">
-    <div class="appbar-titles">
-      <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
-      <div class="sub" id="meta-sub"></div>
-    </div>
-    <div class="appbar-actions">
-      <button id="share-link-btn" type="button" title="複製目前畫面嘅分享連結">🔗 分享連結</button>
-    </div>
+  <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
+  <div class="sub" id="meta-sub"></div>
+  <div class="appbar-actions">
+    <button id="share-link-btn" type="button" title="複製目前畫面嘅分享連結">🔗 分享連結</button>
   </div>
 </header>
 
 <nav class="tabs" id="tabs">
   <button data-tab="day" class="active">📅 揀日子睇全日</button>
   <button data-tab="teacher">👤 揀老師</button>
-  <button data-tab="ai" class="tab-ai">🤖 AI 查詢</button>
+  <button data-tab="ai">🤖 AI 查詢</button>
 </nav>
 
 <main>
@@ -685,13 +666,13 @@
 
   <!-- Tab: AI -->
   <section class="tab-content" id="tab-ai" hidden>
-    <div class="panel ai-tab-panel" role="region" aria-label="AI 時間表助手">
-      <div class="chat-head">
-        <h2 style="margin:0;border:none;padding:0;">🤖 AI 查時間表</h2>
-        <div class="chat-head-actions">
+    <div class="panel panel-ai" role="region" aria-label="AI 時間表助手">
+      <h2>
+        <span>🤖 AI 查時間表</span>
+        <span class="chat-head-actions">
           <button id="chat-settings-toggle" type="button">說明</button>
-        </div>
-      </div>
+        </span>
+      </h2>
       <div id="chat-settings" class="chat-settings">
         <label id="chat-model-wrap">模型
           <select id="chat-model">
@@ -773,6 +754,16 @@
   const STORAGE_KEY = 'timetable-ui-state-v1';
   const TABS = ['day', 'teacher', 'ai'];
   const shareLinkBtn = document.getElementById('share-link-btn');
+
+  function reportEmbedHeight(){
+    const h = Math.max(
+      document.documentElement.scrollHeight,
+      document.body.scrollHeight
+    );
+    try {
+      window.parent.postMessage({ type: 'timetable-resize', height: h }, '*');
+    } catch (_) {}
+  }
   let currentTab = 'day';
   let matrixMode = 'table';
   let matrixClassPreferred = DATA.classes[0] || '';
@@ -834,6 +825,7 @@
       sec.classList.toggle('active', on);
       sec.hidden = !on;
     });
+    setTimeout(reportEmbedHeight, 0);
   }
   function applyState(state){
     if (!state || typeof state !== 'object') return;
@@ -1018,6 +1010,7 @@
       matrixMode === 'period' ? renderClassByPeriod(d, matrixPeriodSel.value)
         : (matrixMode === 'class' ? renderClassByClass(d, matrixClassSel.value) : renderClassMatrix(d));
     syncDayNavButtons();
+    setTimeout(reportEmbedHeight, 0);
   }
 
   function syncDayNavButtons(){
@@ -1273,6 +1266,7 @@
     h += '</details>';
 
     document.getElementById('teacher-schedule').innerHTML = h;
+    setTimeout(reportEmbedHeight, 0);
   }
 
   // ---- Wire events ----
@@ -1730,6 +1724,8 @@
   renderDay();
   renderTeacher();
   persistState();
+  setTimeout(reportEmbedHeight, 100);
+  window.addEventListener('resize', reportEmbedHeight);
 })();
 </script>
 </body>

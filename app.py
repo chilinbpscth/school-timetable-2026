@@ -1,7 +1,6 @@
 """佛教志蓮小學 — 6至7月時間表（Streamlit）
 
-整頁為 GitHub 同款 HTML UI；右下角 AI 查詢經 Streamlit Secrets 呼叫 DeepSeek（唔用側欄）。
-網址參數：?tab=day&dayDate=2026-06-10&teacherName=李&matrixMode=table…
+整頁為 GitHub 同款 HTML UI；AI 查詢在第三個分頁，經 Streamlit Secrets 呼叫 DeepSeek。
 """
 from __future__ import annotations
 
@@ -32,30 +31,46 @@ st.markdown(
     overflow: hidden !important;
   }
   [data-testid="stSidebar"] { display: none !important; }
-  .stApp { margin-top: 0 !important; }
-  section[data-testid="stMain"] {
-    padding-top: 0 !important;
-  }
+  .stApp { margin-top: 0 !important; background: #f7f5f0 !important; }
+  section[data-testid="stMain"] { padding-top: 0 !important; }
   div[data-testid="stMain"] > div.block-container {
     padding: 0 !important;
     max-width: 100% !important;
   }
-  iframe { border: none !important; width: 100% !important; }
+  div[data-testid="stHtml"] { width: 100% !important; }
+  div[data-testid="stHtml"] iframe {
+    border: none !important;
+    width: 100% !important;
+    min-height: 480px;
+  }
 </style>
 """,
     unsafe_allow_html=True,
 )
 
-# iframe 內 AI 面板 postMessage → 更新網址參數 → Python 處理後注入回覆
+# AI 請求 + iframe 高度自動調整
 components.html(
     """
 <script>
 (function () {
-  if (window.__timetableAiListener) return;
-  window.__timetableAiListener = true;
+  if (window.__timetableBridge) return;
+  window.__timetableBridge = true;
+  function resizeFromSource(source, height) {
+    const h = Math.max(480, Number(height) || 0) + 12;
+    document.querySelectorAll("iframe").forEach(function (ifr) {
+      if (ifr.contentWindow === source) {
+        ifr.style.height = h + "px";
+      }
+    });
+  }
   window.addEventListener("message", function (e) {
     const d = e.data;
-    if (!d || d.type !== "timetable-ai-request") return;
+    if (!d || !d.type) return;
+    if (d.type === "timetable-resize") {
+      resizeFromSource(e.source, d.height);
+      return;
+    }
+    if (d.type !== "timetable-ai-request") return;
     try {
       const url = new URL(window.location.href);
       url.searchParams.set("ai_q", d.question || "");
@@ -72,6 +87,7 @@ components.html(
 
 qp_raw = dict(st.query_params)
 processed: set[str] = st.session_state.setdefault("ai_processed", set())
+
 
 def _qp_one(key: str) -> str:
     val = qp_raw.get(key)
@@ -105,4 +121,5 @@ except Exception as e:
     st.error(f"無法載入課表 UI：{e}")
     st.stop()
 
-components.html(ui_html, height=1200, scrolling=False)
+# st.html 比固定高度 iframe 更易保持正確比例
+st.html(ui_html, width="stretch")
