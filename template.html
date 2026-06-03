@@ -421,6 +421,175 @@
     .duty-list li { grid-template-columns: 1fr; gap: 2px; }
     .day-banner .date { font-size: 18px; }
   }
+
+  /* ---- AI Chatbot ---- */
+  .chat-fab {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 30;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid #861f17;
+    background: var(--accent);
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chat-fab:hover { filter: brightness(1.05); }
+  .chat-panel {
+    position: fixed;
+    right: 18px;
+    bottom: 80px;
+    z-index: 31;
+    width: min(420px, calc(100vw - 24px));
+    max-height: min(72vh, 640px);
+    display: none;
+    flex-direction: column;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.16);
+    overflow: hidden;
+  }
+  .chat-panel.open { display: flex; }
+  .chat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    background: var(--accent-soft);
+    border-bottom: 1px solid var(--line);
+  }
+  .chat-head h3 { margin: 0; font-size: 15px; }
+  .chat-head-actions { display: flex; gap: 6px; }
+  .chat-head-actions button {
+    font-family: inherit;
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+  }
+  .chat-settings {
+    display: none;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    background: #faf8f3;
+    font-size: 13px;
+  }
+  .chat-settings.open { display: block; }
+  .chat-settings label { display: block; margin-bottom: 8px; color: var(--muted); }
+  .chat-settings input, .chat-settings select {
+    width: 100%;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 7px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    margin-top: 4px;
+  }
+  .chat-settings .hint {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 200px;
+  }
+  .chat-msg {
+    max-width: 92%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .chat-msg.user {
+    align-self: flex-end;
+    background: var(--accent);
+    color: #fff;
+  }
+  .chat-msg.assistant {
+    align-self: flex-start;
+    background: #f3efe4;
+    border: 1px solid var(--line);
+  }
+  .chat-msg.system {
+    align-self: center;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    padding: 0;
+    text-align: center;
+  }
+  .chat-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 12px 8px;
+  }
+  .chat-suggestions button {
+    font-family: inherit;
+    font-size: 12px;
+    padding: 5px 8px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .chat-suggestions button:hover { background: #f7f2e7; }
+  .chat-compose {
+    display: flex;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--line);
+    background: #faf8f3;
+  }
+  .chat-compose textarea {
+    flex: 1;
+    resize: none;
+    min-height: 42px;
+    max-height: 120px;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .chat-compose button {
+    align-self: flex-end;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+  .chat-compose button:disabled { opacity: 0.5; cursor: not-allowed; }
+  body.chat-open .back-to-top { bottom: 86px; }
+  @media (max-width: 640px) {
+    .chat-panel { right: 12px; bottom: 74px; }
+    .chat-fab { right: 12px; bottom: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -505,6 +674,36 @@
 
 </main>
 <button id="back-to-top" class="back-to-top" type="button">回到頂部 ↑</button>
+
+<button id="chat-fab" class="chat-fab" type="button" title="AI 查時間表">💬</button>
+<div id="chat-panel" class="chat-panel" role="dialog" aria-label="AI 時間表助手">
+  <div class="chat-head">
+    <h3>🤖 AI 查時間表</h3>
+    <div class="chat-head-actions">
+      <button id="chat-settings-toggle" type="button">設定</button>
+      <button id="chat-close" type="button">關閉</button>
+    </div>
+  </div>
+  <div id="chat-settings" class="chat-settings">
+    <label>模型
+      <select id="chat-model">
+        <option value="deepseek-v4-flash" selected>deepseek-v4-flash（快）</option>
+        <option value="deepseek-v4-pro">deepseek-v4-pro（準）</option>
+      </select>
+    </label>
+    <p class="hint">API Key 已存放在 Firebase 後端，訪客無需自行設定。</p>
+  </div>
+  <div id="chat-messages" class="chat-messages"></div>
+  <div class="chat-suggestions" id="chat-suggestions">
+    <button type="button" data-q="今日 1A 第3節上咩？">1A 第3節</button>
+    <button type="button" data-q="李老師今日行程">李老師今日</button>
+    <button type="button" data-q="6月16日有咩特別活動？">6/16 活動</button>
+  </div>
+  <div class="chat-compose">
+    <textarea id="chat-input" rows="2" placeholder="用中文問時間表，例如：符老師下星期三第2節…"></textarea>
+    <button id="chat-send" type="button">送出</button>
+  </div>
+</div>
 
 <script id="data" type="application/json">"__DATA_PLACEHOLDER__"</script>
 
@@ -1071,6 +1270,338 @@
       persistState();
     }
   });
+
+  // ---- AI Chatbot (DeepSeek V4 via Firebase /api/chat) ----
+  const CHAT_MODEL_STORAGE = 'timetable-deepseek-model';
+  const CHAT_HISTORY_STORAGE = 'timetable-chat-history-v1';
+  const CHAT_API = '/api/chat';
+  const chatFab = document.getElementById('chat-fab');
+  const chatPanel = document.getElementById('chat-panel');
+  const chatClose = document.getElementById('chat-close');
+  const chatSettingsToggle = document.getElementById('chat-settings-toggle');
+  const chatSettings = document.getElementById('chat-settings');
+  const chatModelSel = document.getElementById('chat-model');
+  const chatMessagesEl = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+  const chatSendBtn = document.getElementById('chat-send');
+  const chatSuggestions = document.getElementById('chat-suggestions');
+  let chatHistory = [];
+  let chatBusy = false;
+
+  function openChat(){
+    chatPanel.classList.add('open');
+    document.body.classList.add('chat-open');
+    chatInput.focus();
+  }
+  function closeChat(){
+    chatPanel.classList.remove('open');
+    document.body.classList.remove('chat-open');
+  }
+  function loadChatPrefs(){
+    try {
+      const model = localStorage.getItem(CHAT_MODEL_STORAGE);
+      if (model) chatModelSel.value = model;
+      const hist = localStorage.getItem(CHAT_HISTORY_STORAGE);
+      if (hist) {
+        chatHistory = JSON.parse(hist).filter(m => m.role === 'user' || m.role === 'assistant').slice(-12);
+        chatHistory.forEach(m => appendChatBubble(m.role, m.content, false));
+      }
+    } catch (_) {}
+    if (!chatMessagesEl.children.length) {
+      appendChatBubble('system', '你好！我可以根據 6–7 月時間表答問題，直接輸入問題即可。', false);
+    }
+  }
+  function saveChatPrefs(){
+    try {
+      localStorage.setItem(CHAT_MODEL_STORAGE, chatModelSel.value);
+      localStorage.setItem(CHAT_HISTORY_STORAGE, JSON.stringify(chatHistory.slice(-12)));
+    } catch (_) {}
+  }
+  function appendChatBubble(role, text, scroll){
+    const div = document.createElement('div');
+    div.className = 'chat-msg ' + role;
+    div.textContent = text;
+    chatMessagesEl.appendChild(div);
+    if (scroll !== false) chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    return div;
+  }
+  function updateChatBubble(el, text){
+    el.textContent = text;
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  }
+
+  const DUTY_SECTION_LABELS = {
+    recess1: '小息一', recess1_half: '小息', recess2: '小息二',
+    lunch_sup: '午膳各班', lunch_recess: '午息', dismissal: '放學'
+  };
+  const SLOT_LABELS_CHAT = {
+    p1: '第1節', p2: '第2節', p3: '第3節', p4: '第4節', p5: '第5節', p6: '第6節',
+    recess1: '小息1', recess2: '小息2', lunch: '午膳', duty: '當值'
+  };
+
+  function parseDatesFromQuery(q){
+    const found = new Set();
+    const isoRe = /2026-\d{2}-\d{2}/g;
+    let m;
+    while ((m = isoRe.exec(q)) !== null) found.add(m[0]);
+    DATA.days.forEach(d => {
+      const m1 = d.label.match(/(\d+)月(\d+)日/);
+      if (!m1) return;
+      const month = Number(m1[1]);
+      const day = Number(m1[2]);
+      const patterns = [
+        new RegExp(`${month}\\s*月\\s*${day}\\s*日`),
+        new RegExp(`${month}\\s*/\\s*${day}`),
+        new RegExp(`\\b${month}-${day}\\b`),
+      ];
+      if (patterns.some(re => re.test(q))) found.add(d.date);
+    });
+    if (/今日|今天|今個/.test(q)) {
+      const t = new Date().toISOString().slice(0, 10);
+      if (DATA.days.some(d => d.date === t)) found.add(t);
+      else if (dayDateSel.value) found.add(dayDateSel.value);
+    }
+    if (/明日|明天/.test(q)) {
+      const idx = DATA.days.findIndex(d => d.date === (dayDateSel.value || ''));
+      if (idx >= 0 && idx < DATA.days.length - 1) found.add(DATA.days[idx + 1].date);
+    }
+    if (/後日/.test(q)) {
+      const idx = DATA.days.findIndex(d => d.date === (dayDateSel.value || ''));
+      if (idx >= 0 && idx < DATA.days.length - 2) found.add(DATA.days[idx + 2].date);
+    }
+    DATA.days.forEach(d => {
+      const shortLabel = d.label.replace(/\([^)]*\)/, '').trim();
+      if (shortLabel && q.includes(shortLabel)) found.add(d.date);
+      if (d.weekday && new RegExp(`星期${d.weekday}|週${d.weekday}|周${d.weekday}`).test(q)) {
+        const idx = DATA.days.findIndex(x => x.date === dayDateSel.value);
+        if (idx >= 0) {
+          for (let i = Math.max(0, idx - 7); i < Math.min(DATA.days.length, idx + 8); i++) {
+            if (DATA.days[i].weekday === d.weekday) found.add(DATA.days[i].date);
+          }
+        }
+      }
+    });
+    return [...found];
+  }
+  function parseTeachersFromQuery(q){
+    const hits = [];
+    DATA.teachers.forEach(t => {
+      const s = t.short;
+      if (!s) return;
+      if (q.includes(s + '老師') || q.includes(s + '師') || q.includes(s + '主任')) hits.push(s);
+      else if (new RegExp(`(^|[^\\u4e00-\\u9fff])${escapeRegExp(s)}([^\\u4e00-\\u9fff]|$)`).test(q)) hits.push(s);
+    });
+    return [...new Set(hits)];
+  }
+  function parseClassesFromQuery(q){
+    return DATA.classes.filter(c => q.includes(c));
+  }
+
+  function compactDuties(duties){
+    if (!duties) return '';
+    const parts = [];
+    Object.keys(DUTY_SECTION_LABELS).forEach(key => {
+      const list = duties[key];
+      if (!list || !list.length) return;
+      const label = DUTY_SECTION_LABELS[key];
+      const items = list.map(x => `${x.value || ''}${x.label ? '(' + x.label.replace(/\s+/g, ' ') + ')' : ''}`).filter(Boolean);
+      if (items.length) parts.push(`${label}: ${items.join('; ')}`);
+    });
+    return parts.join('\n');
+  }
+  function compactTeacherDay(d, short){
+    const ts = (d.teacherSchedules || {})[short];
+    if (!ts) return `老師 ${short}: 當日無資料`;
+    const slots = ts.slots || {};
+    const lines = [`老師 ${short}${ts.homeroom ? '（班主任 ' + ts.homeroom + '）' : ''}:`];
+    Object.keys(slots).forEach(k => {
+      const v = (slots[k] || '').trim();
+      if (v) lines.push(`  ${SLOT_LABELS_CHAT[k] || k}: ${v}`);
+    });
+    return lines.join('\n');
+  }
+  function compactClassDay(d, classes){
+    const list = classes.length ? classes : DATA.classes;
+    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
+    const lines = [];
+    list.forEach(c => {
+      const sched = (d.classSchedules || {})[c] || {};
+      const cells = [];
+      for (let i = 1; i <= nP; i++) {
+        const v = (sched['p' + i] || '').trim();
+        if (v) cells.push(`p${i}=${v}`);
+      }
+      if (cells.length) lines.push(`${c}: ${cells.join(', ')}`);
+    });
+    return lines.join('\n');
+  }
+  function serializeDayForChat(d, opts){
+    const lines = [`【${d.label} ${d.date}】${d.type === 'full-day' ? '全日' : '半天'}（星期${d.weekday || '?'}）`];
+    if (d.activities) lines.push('當日活動:\n' + d.activities);
+    if (d.morningDuty) {
+      const md = d.morningDuty;
+      lines.push('早上特別當值: ' + (md.title || ''));
+      (md.stations || []).forEach(s => {
+        lines.push(`  ${s.time || ''} ${s.location || ''} → ${s.people || ''}`);
+      });
+    }
+    const dutyText = compactDuties(d.duties);
+    if (dutyText) lines.push('其他當值:\n' + dutyText);
+    if (opts.teachers.length) {
+      opts.teachers.forEach(t => lines.push(compactTeacherDay(d, t)));
+    } else if (opts.includeAllTeachers) {
+      Object.keys(d.teacherSchedules || {}).slice(0, 8).forEach(t => lines.push(compactTeacherDay(d, t)));
+    }
+    if (opts.classes.length) lines.push('班別課表:\n' + compactClassDay(d, opts.classes));
+    else if (opts.includeClassMatrix) lines.push('班別課表:\n' + compactClassDay(d, []));
+    return lines.join('\n');
+  }
+  function pickDaysForQuery(q){
+    const dates = parseDatesFromQuery(q);
+    const teachers = parseTeachersFromQuery(q);
+    const classes = parseClassesFromQuery(q);
+    let dayList = dates.map(findDay).filter(Boolean);
+    if (!dayList.length) {
+      const anchor = dayDateSel.value || DATA.days[0]?.date;
+      const idx = DATA.days.findIndex(d => d.date === anchor);
+      if (idx >= 0) {
+        dayList = DATA.days.slice(Math.max(0, idx - 1), idx + 2);
+      } else {
+        dayList = DATA.days.slice(0, 2);
+      }
+    }
+    dayList = dayList.slice(0, 5);
+    const includeClassMatrix = classes.length === 0 && teachers.length === 0 && dayList.length <= 2;
+    const includeAllTeachers = teachers.length === 0 && dayList.length === 1 && /老師|教師|代課|行程/.test(q);
+    const blocks = dayList.map(d => serializeDayForChat(d, {
+      teachers,
+      classes,
+      includeClassMatrix,
+      includeAllTeachers,
+    }));
+    const teacherList = DATA.teachers.map(t => `${t.short}${t.homeroom ? '(' + t.homeroom + ')' : ''}`).join('、');
+    return {
+      context: [
+        `學校: ${DATA.meta.schoolName}`,
+        `學年: ${DATA.meta.year}｜版本: ${DATA.meta.version}`,
+        `涵蓋日期: ${DATA.days[0]?.label} 至 ${DATA.days[DATA.days.length - 1]?.label}`,
+        `老師簡稱: ${teacherList}`,
+        '',
+        '--- 以下為查詢相關日子資料 ---',
+        blocks.join('\n\n'),
+      ].join('\n'),
+      teachers,
+      dates: dayList.map(d => d.date),
+    };
+  }
+
+  async function streamChat(model, messages, onDelta){
+    const res = await fetch(CHAT_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model, messages }),
+    });
+    if (!res.ok) {
+      let err = '伺服器錯誤 ' + res.status;
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        try {
+          const j = await res.json();
+          if (j.error) err = typeof j.error === 'string' ? j.error : (j.error.message || err);
+        } catch (_) {}
+      } else {
+        try {
+          const t = await res.text();
+          if (t) err = t.slice(0, 300);
+        } catch (_) {}
+      }
+      throw new Error(err);
+    }
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() || '';
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const payload = line.slice(6).trim();
+        if (payload === '[DONE]') return;
+        try {
+          const chunk = JSON.parse(payload);
+          const delta = chunk.choices?.[0]?.delta?.content;
+          if (delta) onDelta(delta);
+        } catch (_) {}
+      }
+    }
+  }
+
+  async function sendChat(userText){
+    const text = (userText || '').trim();
+    if (!text || chatBusy) return;
+    chatBusy = true;
+    chatSendBtn.disabled = true;
+    appendChatBubble('user', text, true);
+    const assistantEl = appendChatBubble('assistant', '…', true);
+    let reply = '';
+    try {
+      const { context } = pickDaysForQuery(text);
+      const systemPrompt = [
+        '你是佛教志蓮小學 2026年6至7月時間表查詢助手。',
+        '只根據用戶提供的「時間表資料」回答，不可捏造課堂、當值或活動。',
+        '若資料中沒有答案，請明確說「資料中找不到」並建議用戶換日期或老師名再問。',
+        '用繁體中文（香港）簡潔回答，可用條列。老師名用簡稱（如李、符）。',
+      ].join('\n');
+      const messages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: '【時間表資料】\n' + context + '\n\n【用戶問題】\n' + text },
+      ];
+      await streamChat(chatModelSel.value, messages, delta => {
+        reply += delta;
+        updateChatBubble(assistantEl, reply || '…');
+      });
+      if (!reply.trim()) reply = '（無回覆內容）';
+      updateChatBubble(assistantEl, reply);
+      chatHistory.push({ role: 'user', content: text });
+      chatHistory.push({ role: 'assistant', content: reply });
+      chatHistory = chatHistory.slice(-12);
+      saveChatPrefs();
+    } catch (err) {
+      updateChatBubble(assistantEl, '❌ ' + (err.message || String(err)));
+    } finally {
+      chatBusy = false;
+      chatSendBtn.disabled = false;
+    }
+  }
+
+  chatFab.addEventListener('click', () => {
+    if (chatPanel.classList.contains('open')) closeChat();
+    else openChat();
+  });
+  chatClose.addEventListener('click', closeChat);
+  chatSettingsToggle.addEventListener('click', () => {
+    chatSettings.classList.toggle('open');
+  });
+  chatModelSel.addEventListener('change', saveChatPrefs);
+  chatSendBtn.addEventListener('click', () => sendChat(chatInput.value));
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChat(chatInput.value);
+      chatInput.value = '';
+    }
+  });
+  chatSuggestions.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-q]');
+    if (!btn) return;
+    chatInput.value = btn.dataset.q;
+    sendChat(btn.dataset.q);
+    chatInput.value = '';
+  });
+  loadChatPrefs();
 
   // Initial render
   syncMatrixModeUI();
