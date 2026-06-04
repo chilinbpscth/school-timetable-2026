@@ -132,6 +132,13 @@ for k in list(st.session_state.keys()):
         ai_reply = st.session_state.pop(k)
         break
 
+# Debug to see if AI request reached Python (will appear above the embedded UI)
+if ai_q or ai_reply:
+    debug_text = f"AI_DEBUG: q='{ai_q[:30] if ai_q else ''}...' rid={ai_rid} reply={'YES' if ai_reply else 'NO'}"
+    if ai_reply:
+        debug_text += f" | text_preview='{ai_reply.get('text','')[:80]}...'"
+    st.caption(debug_text)
+
 try:
     ui_html = load_ui_html(qp_raw, ai_reply=ai_reply)
 except Exception as e:
