@@ -26,14 +26,17 @@ st.markdown(
   [data-testid="stDecoration"],
   div[data-testid="stStatusWidget"],
   [data-testid="stHeader"],
-  .stAppHeader {
+  .stAppHeader,
+  .stHeader {
     display: none !important;
     height: 0 !important;
     min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   [data-testid="stSidebar"] { display: none !important; }
   .stApp { background: #f7f5f0 !important; }
-  html, body, .stApp, [data-testid="stAppViewContainer"] {
+  html, body, .stApp, [data-testid="stAppViewContainer"], .stAppViewContainer {
     padding-top: 0 !important;
     margin-top: 0 !important;
   }
@@ -41,7 +44,9 @@ st.markdown(
   div[data-testid="stMain"],
   [data-testid="stVerticalBlock"],
   .block-container,
-  section.main {
+  section.main,
+  .stMainBlockContainer,
+  [data-baseweb="block"] {
     padding-top: 0 !important;
     margin-top: 0 !important;
   }
@@ -49,7 +54,13 @@ st.markdown(
     padding: 0 !important;
     max-width: 100% !important;
   }
-  iframe { border: none !important; width: 100% !important; margin: 0 !important; }
+  iframe { border: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+  /* Extra aggressive for Cloud viewer */
+  .stApp > div:first-child,
+  .stApp > div:first-child > div:first-child {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
 </style>
 """,
     unsafe_allow_html=True,
@@ -96,6 +107,7 @@ ai_date = _qp_one("ai_date")
 ai_rid = _qp_one("ai_rid")
 ai_reply: dict[str, str] | None = None
 
+# Process incoming AI request from the embedded UI (via postMessage -> query params)
 if ai_q and ai_rid and ai_rid not in processed:
     processed.add(ai_rid)
     anchor = ai_date or pick_boot_params(qp_raw).get("dayDate", "")
@@ -103,10 +115,22 @@ if ai_q and ai_rid and ai_rid not in processed:
         answer = ask_timetable(ai_q, anchor)
     except Exception as e:
         answer = f"❌ {e}"
-    ai_reply = {"text": answer, "requestId": ai_rid, "question": ai_q}
+    st.session_state[f"ai_reply_{ai_rid}"] = {
+        "text": answer,
+        "requestId": ai_rid,
+        "question": ai_q,
+    }
+    # Clear the trigger params cleanly
     for key in ("ai_q", "ai_date", "ai_rid"):
-        if key in st.query_params:
-            del st.query_params[key]
+        st.query_params.pop(key, None)
+    # Rerun with clean URL so the next execution can safely inject the stored reply
+    st.rerun()
+
+# Pick up any stored AI reply from a previous processing (one-shot)
+for k in list(st.session_state.keys()):
+    if k.startswith("ai_reply_"):
+        ai_reply = st.session_state.pop(k)
+        break
 
 try:
     ui_html = load_ui_html(qp_raw, ai_reply=ai_reply)
