@@ -489,6 +489,13 @@
     color: var(--muted);
     line-height: 1.4;
   }
+  .chat-examples {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .chat-examples li { margin: 2px 0; }
   .chat-messages {
     overflow-y: auto;
     padding: 12px;
@@ -688,15 +695,21 @@
           </select>
         </label>
         <p class="hint" id="chat-hint"></p>
+        <ul class="chat-examples">
+          <li>老師簡稱 + 日期：李 6月12、符 12/6、陳6月23日</li>
+          <li>直接查日子：6月23、23/6、6/23 有咩活動？</li>
+          <li>追問都可以：咁第二日呢？咁符老師呢？</li>
+        </ul>
       </div>
       <div id="chat-messages" class="chat-messages"></div>
       <div class="chat-suggestions" id="chat-suggestions">
+        <button type="button" data-q="李 6月12">李 6月12</button>
+        <button type="button" data-q="符 12/6">符 12/6</button>
+        <button type="button" data-q="6月23 有咩特別活動？">6月23 活動</button>
         <button type="button" data-q="今日 1A 第3節上咩？">1A 第3節</button>
-        <button type="button" data-q="李老師今日行程">李老師今日</button>
-        <button type="button" data-q="6月16日有咩特別活動？">6/16 活動</button>
       </div>
       <div class="chat-compose">
-        <textarea id="chat-input" rows="2" placeholder="用中文問時間表，例如：符老師下星期三第2節…"></textarea>
+        <textarea id="chat-input" rows="2" placeholder="可直接輸入：李 6月12、符 12/6、6月23 有咩活動？"></textarea>
         <button id="chat-send" type="button">送出</button>
       </div>
     </div>
@@ -1352,10 +1365,17 @@
     try {
       const model = localStorage.getItem(CHAT_MODEL_STORAGE);
       if (model) chatModelSel.value = model;
-      const hist = localStorage.getItem(CHAT_HISTORY_STORAGE);
-      if (hist) {
-        chatHistory = JSON.parse(hist).filter(m => m.role === 'user' || m.role === 'assistant').slice(-12);
+      if (Array.isArray(bootCfg.chatHistory)) {
+        chatHistory = bootCfg.chatHistory
+          .filter(m => m && (m.role === 'user' || m.role === 'assistant') && m.content)
+          .slice(-12);
         chatHistory.forEach(m => appendChatBubble(m.role, m.content, false));
+      } else {
+        const hist = localStorage.getItem(CHAT_HISTORY_STORAGE);
+        if (hist) {
+          chatHistory = JSON.parse(hist).filter(m => m.role === 'user' || m.role === 'assistant').slice(-12);
+          chatHistory.forEach(m => appendChatBubble(m.role, m.content, false));
+        }
       }
     } catch (_) {}
     if (!chatMessagesEl.children.length) {
@@ -1430,7 +1450,14 @@
 
     // Update an existing loading '…' bubble if present, otherwise append the reply
     const lastAssistant = chatMessagesEl.querySelector('.chat-msg.assistant:last-of-type');
-    if (lastAssistant && (lastAssistant.textContent === '…' || lastAssistant.textContent.includes('查詢中'))) {
+    const assistantMsgs = [...chatMessagesEl.querySelectorAll('.chat-msg.assistant')];
+    const alreadyHasReply = assistantMsgs.some(el => (el.textContent || '').trim() === replyText.trim());
+    if (alreadyHasReply) {
+      chatBusy = false;
+      chatSendBtn.disabled = false;
+      saveChatPrefs();
+      return;
+    } else if (lastAssistant && (lastAssistant.textContent === '…' || lastAssistant.textContent.includes('查詢中'))) {
       updateChatBubble(lastAssistant, replyText);
     } else {
       appendChatBubble('assistant', replyText, true);
@@ -1474,9 +1501,11 @@
       const month = Number(m1[1]);
       const day = Number(m1[2]);
       const patterns = [
-        new RegExp(`${month}\\s*月\\s*${day}\\s*日`),
+        new RegExp(`${month}\\s*月\\s*${day}\\s*(日|號)?`),
         new RegExp(`${month}\\s*/\\s*${day}`),
+        new RegExp(`${day}\\s*/\\s*${month}`),
         new RegExp(`\\b${month}-${day}\\b`),
+        new RegExp(`\\b${day}-${month}\\b`),
       ];
       if (patterns.some(re => re.test(q))) found.add(d.date);
     });
@@ -1664,35 +1693,27 @@
 
   function sendChatStreamlit(text, assistantEl){
     const requestId = 'r' + Date.now();
+    const priorHistory = chatHistory.slice(-8);
     try {
       sessionStorage.setItem(CHAT_PENDING_RID, requestId);
       sessionStorage.setItem('timetable-ai-pending-q-' + requestId, text);
     } catch (_) {}
+    chatHistory.push({ role: 'user', content: text });
+    chatHistory = chatHistory.slice(-12);
+    saveChatPrefs();
     const payload = {
       type: 'timetable-ai-request',
       question: text,
       anchorDate: dayDateSel.value || '',
       requestId,
+      history: priorHistory,
     };
-    try {
-      window.parent.postMessage(payload, '*');
-      for (let i = 0; i < window.parent.frames.length; i++) {
-        if (window.parent.frames[i] !== window) {
-          window.parent.frames[i].postMessage(payload, '*');
-        }
-      }
-    } catch (_) {}
+    updateChatBubble(assistantEl, '查詢中…（伺服器處理）');
     setTimeout(() => {
       try {
-        const url = new URL(window.parent.location.href);
-        if (url.searchParams.get('ai_rid') === requestId) return;
-        url.searchParams.set('ai_q', text);
-        url.searchParams.set('ai_date', dayDateSel.value || '');
-        url.searchParams.set('ai_rid', requestId);
-        window.parent.location.replace(url.toString());
+        window.parent.postMessage(payload, '*');
       } catch (_) {}
-    }, 800);
-    updateChatBubble(assistantEl, '查詢中…（伺服器處理）');
+    }, 120);
   }
 
   async function sendChat(userText){

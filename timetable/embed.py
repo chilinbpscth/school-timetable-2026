@@ -64,11 +64,14 @@ def load_ui_html(
     query: dict | None = None,
     *,
     ai_reply: dict[str, str] | None = None,
+    chat_history: list[dict[str, str]] | None = None,
 ) -> str:
     ensure_index_html()
     html = INDEX.read_text(encoding="utf-8")
     boot = pick_boot_params(query)
     boot["aiMode"] = "streamlit"
+    if chat_history:
+        boot["chatHistory"] = chat_history[-12:]
     if ai_reply:
         boot["aiReply"] = ai_reply.get("text", "")
         boot["aiReplyId"] = ai_reply.get("requestId", "")

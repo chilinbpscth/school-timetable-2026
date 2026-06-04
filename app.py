@@ -4,11 +4,19 @@
 """
 from __future__ import annotations
 
+from pathlib import Path
+
 import streamlit as st
 import streamlit.components.v1 as components
 
 from timetable.chat import ask_timetable
 from timetable.embed import load_ui_html, pick_boot_params
+
+ROOT = Path(__file__).resolve().parent
+TIMETABLE_COMPONENT = components.declare_component(
+    "timetable_ui",
+    path=ROOT / "streamlit_component",
+)
 
 st.set_page_config(
     page_title="佛教志蓮小學 — 時間表查詢",
@@ -66,31 +74,9 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-components.html(
-    """
-<script>
-(function () {
-  if (window.__timetableBridge) return;
-  window.__timetableBridge = true;
-  window.addEventListener("message", function (e) {
-    const d = e.data;
-    if (!d || d.type !== "timetable-ai-request") return;
-    try {
-      const url = new URL(window.parent.location.href);
-      url.searchParams.set("ai_q", d.question || "");
-      url.searchParams.set("ai_date", d.anchorDate || "");
-      url.searchParams.set("ai_rid", d.requestId || String(Date.now()));
-      window.parent.location.replace(url.toString());
-    } catch (_) {}
-  });
-})();
-</script>
-""",
-    height=0,
-)
-
 qp_raw = dict(st.query_params)
 processed: set[str] = st.session_state.setdefault("ai_processed", set())
+chat_history: list[dict[str, str]] = st.session_state.setdefault("chat_history", [])
 
 
 def _qp_one(key: str) -> str:
@@ -107,19 +93,55 @@ ai_date = _qp_one("ai_date")
 ai_rid = _qp_one("ai_rid")
 ai_reply: dict[str, str] | None = None
 
-# Process incoming AI request from the embedded UI (via postMessage -> query params)
-if ai_q and ai_rid and ai_rid not in processed:
-    processed.add(ai_rid)
-    anchor = ai_date or pick_boot_params(qp_raw).get("dayDate", "")
+
+def _clean_component_history(value: object) -> list[dict[str, str]]:
+    if not isinstance(value, list):
+        return []
+    out: list[dict[str, str]] = []
+    for item in value[-8:]:
+        if not isinstance(item, dict):
+            continue
+        role = item.get("role")
+        content = str(item.get("content") or "").strip()
+        if role in {"user", "assistant"} and content:
+            out.append({"role": role, "content": content[:1200]})
+    return out
+
+
+def process_ai_request(
+    question: str,
+    anchor_date: str,
+    request_id: str,
+    history: list[dict[str, str]] | None = None,
+) -> bool:
+    question = (question or "").strip()
+    request_id = (request_id or "").strip()
+    if not question or not request_id or request_id in processed:
+        return False
+
+    processed.add(request_id)
+    anchor = anchor_date or pick_boot_params(qp_raw).get("dayDate", "")
+    recent_history = history or chat_history
     try:
-        answer = ask_timetable(ai_q, anchor)
+        answer = ask_timetable(question, anchor, history=recent_history)
     except Exception as e:
         answer = f"❌ {e}"
-    st.session_state[f"ai_reply_{ai_rid}"] = {
+    updated_history = (recent_history + [
+        {"role": "user", "content": question},
+        {"role": "assistant", "content": answer},
+    ])[-12:]
+    st.session_state["chat_history"] = updated_history
+    st.session_state[f"ai_reply_{request_id}"] = {
         "text": answer,
-        "requestId": ai_rid,
-        "question": ai_q,
+        "requestId": request_id,
+        "question": question,
+        "history": updated_history,
     }
+    return True
+
+
+# Process incoming AI request from query params for backwards compatibility.
+if process_ai_request(ai_q, ai_date, ai_rid):
     # Clear the trigger params cleanly
     for key in ("ai_q", "ai_date", "ai_rid"):
         st.query_params.pop(key, None)
@@ -133,10 +155,22 @@ for k in list(st.session_state.keys()):
         break
 
 try:
-    ui_html = load_ui_html(qp_raw, ai_reply=ai_reply)
+    ui_html = load_ui_html(
+        qp_raw,
+        ai_reply=ai_reply,
+        chat_history=st.session_state.get("chat_history", []),
+    )
 except Exception as e:
     st.error(f"無法載入課表 UI：{e}")
     st.stop()
 
-# 必須用 components.html：iframe 內可執行課表 JS（st.html 官方唔支援 JS）
-components.html(ui_html, height=1500, scrolling=True)
+component_event = TIMETABLE_COMPONENT(html=ui_html, height=1500, key="timetable_ui")
+if isinstance(component_event, dict) and component_event.get("type") == "timetable-ai-request":
+    did_process = process_ai_request(
+        str(component_event.get("question") or ""),
+        str(component_event.get("anchorDate") or ""),
+        str(component_event.get("requestId") or ""),
+        _clean_component_history(component_event.get("history")),
+    )
+    if did_process:
+        st.rerun()

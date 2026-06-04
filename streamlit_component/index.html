@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: #f7f5f0;
+      overflow: hidden;
+    }
+    iframe {
+      display: block;
+      width: 100%;
+      height: 1500px;
+      border: 0;
+      margin: 0;
+      padding: 0;
+      background: #f7f5f0;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="ui" title="時間表查詢"></iframe>
+  <script>
+    const Streamlit = {
+      ready() {
+        window.parent.postMessage({
+          isStreamlitMessage: true,
+          type: 'streamlit:componentReady',
+          apiVersion: 1,
+        }, '*');
+      },
+      setFrameHeight(height) {
+        window.parent.postMessage({
+          isStreamlitMessage: true,
+          type: 'streamlit:setFrameHeight',
+          height,
+        }, '*');
+      },
+      setComponentValue(value) {
+        window.parent.postMessage({
+          isStreamlitMessage: true,
+          type: 'streamlit:setComponentValue',
+          value,
+        }, '*');
+      },
+    };
+
+    const ui = document.getElementById('ui');
+    let lastHtml = '';
+
+    function render(args) {
+      const html = (args && args.html) || '';
+      const height = Number((args && args.height) || 1500);
+      if (height && height !== ui.height) {
+        ui.style.height = height + 'px';
+        Streamlit.setFrameHeight(height);
+      }
+      if (html && html !== lastHtml) {
+        lastHtml = html;
+        ui.srcdoc = html;
+      }
+    }
+
+    window.addEventListener('message', event => {
+      const data = event.data || {};
+      if (data.type === 'streamlit:render') {
+        render(data.args || {});
+        return;
+      }
+      if (data.type === 'timetable-ai-request') {
+        Streamlit.setComponentValue({
+          type: 'timetable-ai-request',
+          question: data.question || '',
+          anchorDate: data.anchorDate || '',
+          requestId: data.requestId || String(Date.now()),
+        });
+      }
+    });
+
+    Streamlit.ready();
+    Streamlit.setFrameHeight(1500);
+  </script>
+</body>
+</html>

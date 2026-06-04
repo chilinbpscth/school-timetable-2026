@@ -29,9 +29,11 @@ def parse_dates_from_query(q: str, data: dict, anchor_date: str) -> list[str]:
         if m1:
             month, day = int(m1.group(1)), int(m1.group(2))
             patterns = [
-                rf"{month}\s*月\s*{day}\s*日",
+                rf"{month}\s*月\s*{day}\s*(?:日|號)?",
                 rf"{month}\s*/\s*{day}",
+                rf"{day}\s*/\s*{month}",
                 rf"\b{month}-{day}\b",
+                rf"\b{day}-{month}\b",
             ]
             if any(re.search(p, q) for p in patterns):
                 found.add(d["date"])
