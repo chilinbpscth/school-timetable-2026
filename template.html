@@ -2,7 +2,7 @@
 <html lang="zh-Hant-HK">
 <head>
 <meta charset="utf-8">
-<title>佛教志蓮小學 — 6至7月時間表查詢</title>
+<title>示範小學 — 6至7月時間表查詢</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
   :root {
@@ -596,7 +596,7 @@
 
 <header class="appbar">
   <div class="appbar-inner">
-    <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
+    <h1>示範小學 — 6 至 7 月時間表查詢</h1>
     <div class="sub" id="meta-sub"></div>
     <div class="appbar-actions">
       <button id="share-link-btn" type="button" title="複製目前畫面嘅分享連結">🔗 分享連結</button>
@@ -696,20 +696,20 @@
         </label>
         <p class="hint" id="chat-hint"></p>
         <ul class="chat-examples">
-          <li>老師簡稱 + 日期：李 6月12、符 12/6、陳6月23日</li>
+          <li>老師代號 + 日期：T01 6月12、T02 12/6、T03 6月23日</li>
           <li>直接查日子：6月23、23/6、6/23 有咩活動？</li>
-          <li>追問都可以：咁第二日呢？咁符老師呢？</li>
+          <li>追問都可以：咁第二日呢？咁 T02 老師呢？</li>
         </ul>
       </div>
       <div id="chat-messages" class="chat-messages"></div>
       <div class="chat-suggestions" id="chat-suggestions">
-        <button type="button" data-q="李 6月12">李 6月12</button>
-        <button type="button" data-q="符 12/6">符 12/6</button>
+        <button type="button" data-q="T01 6月12">T01 6月12</button>
+        <button type="button" data-q="T02 12/6">T02 12/6</button>
         <button type="button" data-q="6月23 有咩特別活動？">6月23 活動</button>
         <button type="button" data-q="今日 1A 第3節上咩？">1A 第3節</button>
       </div>
       <div class="chat-compose">
-        <textarea id="chat-input" rows="2" placeholder="可直接輸入：李 6月12、符 12/6、6月23 有咩活動？"></textarea>
+        <textarea id="chat-input" rows="2" placeholder="可直接輸入：T01 6月12、T02 12/6、6月23 有咩活動？"></textarea>
         <button id="chat-send" type="button">送出</button>
       </div>
     </div>
@@ -1735,10 +1735,10 @@
       }
       const { context } = pickDaysForQuery(text);
       const systemPrompt = [
-        '你是佛教志蓮小學 2026年6至7月時間表查詢助手。',
+        '你是示範小學 2026年6至7月時間表查詢助手。',
         '只根據用戶提供的「時間表資料」回答，不可捏造課堂、當值或活動。',
         '若資料中沒有答案，請明確說「資料中找不到」並建議用戶換日期或老師名再問。',
-        '用繁體中文（香港）簡潔回答，可用條列。老師名用簡稱（如李、符）。',
+        '用繁體中文（香港）簡潔回答，可用條列。老師名用代號（如T01、T02）。',
       ].join('\n');
       const messages = [
         { role: 'system', content: systemPrompt },

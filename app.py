@@ -1,4 +1,4 @@
-"""佛教志蓮小學 — 6至7月時間表（Streamlit）
+"""示範小學 — 6至7月時間表（Streamlit）
 
 整頁為 GitHub 同款 HTML（必須用 components.html 嵌入，st.html 唔會跑 JS）。
 """
@@ -19,7 +19,7 @@ TIMETABLE_COMPONENT = components.declare_component(
 )
 
 st.set_page_config(
-    page_title="佛教志蓮小學 — 時間表查詢",
+    page_title="示範小學 — 時間表查詢",
     page_icon="📅",
     layout="wide",
     initial_sidebar_state="collapsed",

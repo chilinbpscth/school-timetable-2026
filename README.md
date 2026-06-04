@@ -1,11 +1,11 @@
-# 佛教志蓮小學 — 6至7月時間表查詢
+# 示範小學 — 6至7月時間表查詢 Demo
 
-互動式時間表工具，專為 2025-2026 學年 6 月至 7 月而設。
+互動式時間表工具 demo，使用已匿名化及重組的示範資料。
 
 支援**日期課表**、**老師個人行程** 同 **AI 自然語言查詢**（DeepSeek）。
 
-**即時預覽（靜態版）**：  
-https://raw.githack.com/chilinbpscth/school-timetable-2026/main/index.html  
+**即時預覽（靜態版）**：<br>
+https://raw.githack.com/your-org/school-timetable-2026/demo-anonymized/index.html
 （或 clone 後本地 `python3 -m http.server 8765` 開 http://localhost:8765/index.html）
 
 ## 主要功能
@@ -13,7 +13,7 @@ https://raw.githack.com/chilinbpscth/school-timetable-2026/main/index.html
 - 📅 **揀日子睇全日**：每節課表、當值（小息/午膳/放學）、特別活動、早上特別當值、鐘聲時間表
 - 👤 **揀老師**：老師簡稱搜尋，顯示班主任 + 每節擔任工作（包括跨班數遊、LAMK 等）
 - 🤖 **AI 查詢**：用自然語言提問，例如：
-  - 「李老師 6 月 12 日 有幾多堂？」
+  - 「T01 老師 6 月 12 日有幾多堂？」
   - 「6月23日 5B 午膳邊個當值？」
   - 「後日 4A 有冇特別活動？」
 - 支援分享連結（URL 帶參數，可直接開特定日子/老師/AI 問題）
@@ -24,7 +24,7 @@ https://raw.githack.com/chilinbpscth/school-timetable-2026/main/index.html
 - **靜態版**：單一 `index.html`（template.html + data.json 經 build.py 嵌入），純前端 JS，適合 GitHub Pages / Firebase Hosting 直接 host。
 - **Streamlit 版**：`app.py` 使用 `st.components.v1.html` 完整嵌入同一個 UI，負責 secrets 管理同 AI 後端呼叫。
 - **AI**：使用 DeepSeek（OpenAI 相容 API），`timetable/context.py` 會智能抽取相關日子、老師、班別、當值資料，控制 token 數量。
-- **資料**：`data.json` 為單一事實來源（21 日，22 班，48 位老師）。
+- **資料**：`data.json` 為單一事實來源（21 日，22 班，48 位匿名化老師代號）。
 - **更新流程**：手動維護 data.json → `python3 build.py`
 - **可選後端**：Firebase Cloud Functions 提供 `/api/chat` proxy（避免前端暴露 key）。
 
@@ -68,15 +68,15 @@ cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 3. 測試靜態版同 Streamlit 版。
 4. Commit + push。
 
-（parser.py 內有硬編碼路徑，僅供學校內網環境使用。）
+（parser.py 只保留作原型參考；demo 分支不應用於還原真實資料。）
 
 ## Deploy 到 Streamlit Community Cloud
 
 1. 確保最新 code 已 push 到 GitHub（呢個 repo）。
 2. 前往 [https://share.streamlit.io/](https://share.streamlit.io/)
 3. 用擁有此 GitHub repo 權限的帳號登入。
-4. **New app** → 選擇 "From existing repo" → 揀 `chilinbpscth/school-timetable-2026`
-5. Branch 選 `main`
+4. **New app** → 選擇 "From existing repo" → 揀你的 demo repo
+5. Branch 選 `demo-anonymized`
 6. Main file path 填 `app.py`
 7. **Deploy**
 

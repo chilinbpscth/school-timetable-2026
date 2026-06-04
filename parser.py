@@ -596,7 +596,7 @@ def build():
 
     data = {
         'meta': {
-            'schoolName': '佛教志蓮小學',
+            'schoolName': '示範小學',
             'year': '2025-2026',
             'version': '15/5版',
             'generatedFromDocx': True,
