@@ -30,9 +30,14 @@
     position: relative;
     background: var(--accent);
     color: #fff;
+    border-bottom: 3px solid #861f17;
+  }
+  header.appbar .appbar-inner {
+    max-width: 1300px;
+    margin: 0 auto;
     padding: 14px 20px;
     padding-right: 132px;
-    border-bottom: 3px solid #861f17;
+    position: relative;
   }
   header.appbar h1 {
     margin: 0; font-size: 20px; font-weight: 600;
@@ -583,10 +588,12 @@
 <body>
 
 <header class="appbar">
-  <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
-  <div class="sub" id="meta-sub"></div>
-  <div class="appbar-actions">
-    <button id="share-link-btn" type="button" title="複製目前畫面嘅分享連結">🔗 分享連結</button>
+  <div class="appbar-inner">
+    <h1>佛教志蓮小學 — 6 至 7 月時間表查詢</h1>
+    <div class="sub" id="meta-sub"></div>
+    <div class="appbar-actions">
+      <button id="share-link-btn" type="button" title="複製目前畫面嘅分享連結">🔗 分享連結</button>
+    </div>
   </div>
 </header>
 
