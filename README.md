@@ -4,7 +4,9 @@
 
 支援**日期課表**、**老師個人行程** 同 **AI 自然語言查詢**（DeepSeek）。
 
-![預覽](https://raw.githubusercontent.com/chilinbpscth/school-timetable-2026/main/index.html) <!-- 實際可用時可換真截圖或移除 -->
+**即時預覽（靜態版）**：  
+https://raw.githack.com/chilinbpscth/school-timetable-2026/main/index.html  
+（或 clone 後本地 `python3 -m http.server 8765` 開 http://localhost:8765/index.html）
 
 ## 主要功能
 
