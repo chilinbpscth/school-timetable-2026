@@ -72,4 +72,5 @@ def load_ui_html(
     if ai_reply:
         boot["aiReply"] = ai_reply.get("text", "")
         boot["aiReplyId"] = ai_reply.get("requestId", "")
+        boot["aiQuestion"] = ai_reply.get("question", "")
     return inject_streamlit_boot(html, boot)

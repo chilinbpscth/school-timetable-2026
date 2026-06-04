@@ -1392,25 +1392,64 @@
   }
   function consumeStreamlitReply(){
     const rid = bootCfg.aiReplyId;
-    const text = bootCfg.aiReply;
-    if (!rid || !text) return;
+    const replyText = bootCfg.aiReply;
+    if (!rid || !replyText) return;
+
     const pending = sessionStorage.getItem(CHAT_PENDING_RID);
+    const savedQ = sessionStorage.getItem('timetable-ai-pending-q-' + rid) || bootCfg.aiQuestion || '';
+
+    // Only consume if this rid matches the current pending (or no strict pending)
     if (pending && pending !== rid) return;
-    sessionStorage.removeItem(CHAT_PENDING_RID);
-    const last = chatMessagesEl.querySelector('.chat-msg.assistant:last-of-type');
-    if (last && last.textContent === '…') {
-      updateChatBubble(last, text);
-    } else {
-      appendChatBubble('assistant', text, true);
+
+    // Clean up pending markers
+    try {
+      sessionStorage.removeItem(CHAT_PENDING_RID);
+      sessionStorage.removeItem('timetable-ai-pending-q-' + rid);
+    } catch (_) {}
+
+    // If we have a saved question for this reply, make sure it appears as a user bubble
+    // (in case the reload lost the temporary DOM bubbles from before navigation)
+    let hasMatchingUser = false;
+    if (savedQ) {
+      const userMsgs = [...chatMessagesEl.querySelectorAll('.chat-msg.user')];
+      if (userMsgs.length) {
+        const lastU = userMsgs[userMsgs.length-1].textContent || '';
+        if (lastU.trim() === savedQ.trim()) hasMatchingUser = true;
+      }
+      // Also check restored history
+      if (!hasMatchingUser && chatHistory.length) {
+        const lastHist = chatHistory[chatHistory.length-1];
+        if (lastHist && lastHist.role === 'user' && lastHist.content.trim() === savedQ.trim()) {
+          hasMatchingUser = true;
+        }
+      }
+      if (!hasMatchingUser) {
+        appendChatBubble('user', savedQ, true);
+      }
     }
-    const userMsgs = [...chatMessagesEl.querySelectorAll('.chat-msg.user')];
-    const lastUser = userMsgs.length ? userMsgs[userMsgs.length - 1].textContent : '';
-    if (lastUser) {
-      chatHistory.push({ role: 'user', content: lastUser });
-      chatHistory.push({ role: 'assistant', content: text });
+
+    // Update an existing loading '…' bubble if present, otherwise append the reply
+    const lastAssistant = chatMessagesEl.querySelector('.chat-msg.assistant:last-of-type');
+    if (lastAssistant && (lastAssistant.textContent === '…' || lastAssistant.textContent.includes('查詢中'))) {
+      updateChatBubble(lastAssistant, replyText);
+    } else {
+      appendChatBubble('assistant', replyText, true);
+    }
+
+    // Persist to history if we have the question
+    const qToSave = savedQ || (chatMessagesEl.querySelectorAll('.chat-msg.user').length
+      ? [...chatMessagesEl.querySelectorAll('.chat-msg.user')].pop().textContent : '');
+    if (qToSave) {
+      // Avoid duplicating if already the last in history
+      const lastH = chatHistory.length ? chatHistory[chatHistory.length-1] : null;
+      if (!lastH || lastH.content.trim() !== qToSave.trim()) {
+        chatHistory.push({ role: 'user', content: qToSave });
+      }
+      chatHistory.push({ role: 'assistant', content: replyText });
       chatHistory = chatHistory.slice(-12);
       saveChatPrefs();
     }
+
     chatBusy = false;
     chatSendBtn.disabled = false;
   }
@@ -1625,7 +1664,10 @@
 
   function sendChatStreamlit(text, assistantEl){
     const requestId = 'r' + Date.now();
-    try { sessionStorage.setItem(CHAT_PENDING_RID, requestId); } catch (_) {}
+    try {
+      sessionStorage.setItem(CHAT_PENDING_RID, requestId);
+      sessionStorage.setItem('timetable-ai-pending-q-' + requestId, text);
+    } catch (_) {}
     window.parent.postMessage({
       type: 'timetable-ai-request',
       question: text,

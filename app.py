@@ -24,17 +24,32 @@ st.markdown(
   header[data-testid="stHeader"],
   [data-testid="stToolbar"],
   [data-testid="stDecoration"],
-  div[data-testid="stStatusWidget"] {
+  div[data-testid="stStatusWidget"],
+  [data-testid="stHeader"],
+  .stAppHeader {
     display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
   }
   [data-testid="stSidebar"] { display: none !important; }
   .stApp { background: #f7f5f0 !important; }
-  section[data-testid="stMain"] { padding-top: 0 !important; }
+  html, body, .stApp, [data-testid="stAppViewContainer"] {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+  section[data-testid="stMain"],
+  div[data-testid="stMain"],
+  [data-testid="stVerticalBlock"],
+  .block-container,
+  section.main {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
   div[data-testid="stMain"] > div.block-container {
     padding: 0 !important;
     max-width: 100% !important;
   }
-  iframe { border: none !important; width: 100% !important; }
+  iframe { border: none !important; width: 100% !important; margin: 0 !important; }
 </style>
 """,
     unsafe_allow_html=True,
@@ -88,7 +103,7 @@ if ai_q and ai_rid and ai_rid not in processed:
         answer = ask_timetable(ai_q, anchor)
     except Exception as e:
         answer = f"❌ {e}"
-    ai_reply = {"text": answer, "requestId": ai_rid}
+    ai_reply = {"text": answer, "requestId": ai_rid, "question": ai_q}
     for key in ("ai_q", "ai_date", "ai_rid"):
         if key in st.query_params:
             del st.query_params[key]
