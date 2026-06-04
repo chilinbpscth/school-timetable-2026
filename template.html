@@ -1668,12 +1668,30 @@
       sessionStorage.setItem(CHAT_PENDING_RID, requestId);
       sessionStorage.setItem('timetable-ai-pending-q-' + requestId, text);
     } catch (_) {}
-    window.parent.postMessage({
+    const payload = {
       type: 'timetable-ai-request',
       question: text,
       anchorDate: dayDateSel.value || '',
       requestId,
-    }, '*');
+    };
+    try {
+      window.parent.postMessage(payload, '*');
+      for (let i = 0; i < window.parent.frames.length; i++) {
+        if (window.parent.frames[i] !== window) {
+          window.parent.frames[i].postMessage(payload, '*');
+        }
+      }
+    } catch (_) {}
+    setTimeout(() => {
+      try {
+        const url = new URL(window.parent.location.href);
+        if (url.searchParams.get('ai_rid') === requestId) return;
+        url.searchParams.set('ai_q', text);
+        url.searchParams.set('ai_date', dayDateSel.value || '');
+        url.searchParams.set('ai_rid', requestId);
+        window.parent.location.replace(url.toString());
+      } catch (_) {}
+    }, 800);
     updateChatBubble(assistantEl, '查詢中…（伺服器處理）');
   }
 

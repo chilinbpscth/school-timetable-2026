@@ -76,11 +76,11 @@ components.html(
     const d = e.data;
     if (!d || d.type !== "timetable-ai-request") return;
     try {
-      const url = new URL(window.location.href);
+      const url = new URL(window.parent.location.href);
       url.searchParams.set("ai_q", d.question || "");
       url.searchParams.set("ai_date", d.anchorDate || "");
       url.searchParams.set("ai_rid", d.requestId || String(Date.now()));
-      window.location.replace(url.toString());
+      window.parent.location.replace(url.toString());
     } catch (_) {}
   });
 })();
