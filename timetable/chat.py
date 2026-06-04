@@ -44,6 +44,5 @@ def ask_timetable(user_question: str, anchor_date: str) -> str:
         ],
         temperature=0.3,
         max_tokens=2048,
-        extra_body={"thinking": {"type": "disabled"}},
     )
     return (resp.choices[0].message.content or "").strip() or "（無回覆內容）"
