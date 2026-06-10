@@ -260,6 +260,31 @@
     text-align: center;
   }
   .matrix-period td.empty { color: var(--muted); }
+  .matrix-class-view table {
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .matrix-class-view caption {
+    caption-side: top;
+    text-align: left;
+    font-weight: 700;
+    padding: 0 0 8px;
+  }
+  .matrix-class-view th,
+  .matrix-class-view td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    vertical-align: top;
+  }
+  .matrix-class-view th {
+    width: 82px;
+    background: #efeadc;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .matrix-class-view td.empty { color: var(--muted); }
   .class-matrix table {
     min-width: 700px;
   }
@@ -436,12 +461,26 @@
   @media (max-width: 640px) {
     main { padding: 10px; }
     .panel { padding: 12px; }
-    nav.tabs { overflow-x: auto; }
+    nav.tabs { overflow-x: visible; }
     nav.tabs button {
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 10px 4px;
+      font-size: 0;
+      white-space: nowrap;
+    }
+    nav.tabs button::after {
       font-size: 13px;
-      padding: 10px 8px;
-      flex: 0 0 auto;
-      min-width: 140px;
+      line-height: 1.2;
+    }
+    nav.tabs button[data-tab="day"]::after {
+      content: "📅 日子";
+    }
+    nav.tabs button[data-tab="teacher"]::after {
+      content: "👤 老師";
+    }
+    nav.tabs button[data-tab="ai"]::after {
+      content: "🤖 AI";
     }
     .teacher-slot { grid-template-columns: 1fr; gap: 4px; }
     .duty-list li { grid-template-columns: 1fr; gap: 2px; }
@@ -497,14 +536,13 @@
   }
   .chat-examples li { margin: 2px 0; }
   .chat-messages {
-    overflow-y: auto;
+    overflow: visible;
     padding: 12px;
     margin-bottom: 10px;
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-height: 240px;
-    max-height: 420px;
+    min-height: 180px;
     border: 1px solid var(--line);
     border-radius: 6px;
     background: #faf8f3;
@@ -588,6 +626,25 @@
       bottom: 10px;
       right: 12px;
       transform: none;
+    }
+    .panel-ai h2 {
+      align-items: flex-start;
+    }
+    .chat-settings {
+      padding: 8px 10px;
+    }
+    .chat-examples {
+      display: none;
+    }
+    .chat-messages {
+      min-height: 190px;
+      padding: 10px;
+    }
+    .chat-msg {
+      max-width: 96%;
+    }
+    .chat-compose textarea {
+      min-height: 52px;
     }
   }
 </style>
@@ -852,6 +909,7 @@
   function buildShareUrl(){
     const state = collectState();
     const params = new URLSearchParams();
+    params.set('share', '1');
     params.set('tab', state.tab);
     params.set('dayDate', state.dayDate);
     params.set('teacherDate', state.teacherDate);
@@ -870,15 +928,10 @@
   function persistState(){
     const state = collectState();
     saveStorage(state);
-    const params = new URLSearchParams();
-    params.set('tab', state.tab);
-    params.set('dayDate', state.dayDate);
-    params.set('teacherDate', state.teacherDate);
-    params.set('teacherName', state.teacherName);
-    params.set('matrixMode', state.matrixMode);
-    params.set('matrixClass', state.matrixClass);
-    params.set('matrixPeriod', state.matrixPeriod);
-    history.replaceState(null, '', `${location.pathname}?${params.toString()}`);
+    history.replaceState(null, '', location.pathname);
+  }
+  function isSharedState(params){
+    return params && params.get('share') === '1';
   }
   if (shareLinkBtn) {
     shareLinkBtn.addEventListener('click', async () => {
@@ -898,22 +951,23 @@
     });
   }
   function restoreInitialState(){
-    applyState(safeReadStorage());
     const boot = window.__STREAMLIT_BOOT__;
     if (boot && typeof boot === 'object') {
-      applyState({
-        tab: boot.tab,
-        dayDate: boot.dayDate,
-        teacherDate: boot.teacherDate,
-        teacherName: boot.teacherName,
-        matrixMode: boot.matrixMode,
-        matrixClass: boot.matrixClass,
-        matrixPeriod: boot.matrixPeriod,
-      });
+      if (boot.share === '1') {
+        applyState({
+          tab: boot.tab,
+          dayDate: boot.dayDate,
+          teacherDate: boot.teacherDate,
+          teacherName: boot.teacherName,
+          matrixMode: boot.matrixMode,
+          matrixClass: boot.matrixClass,
+          matrixPeriod: boot.matrixPeriod,
+        });
+      }
       return;
     }
     const params = new URLSearchParams(location.search);
-    if (params.toString()) {
+    if (isSharedState(params)) {
       applyState({
         tab: params.get('tab'),
         dayDate: params.get('dayDate'),
@@ -929,9 +983,13 @@
     const todayIso = new Date().toISOString().slice(0, 10);
     const hasToday = DATA.days.some(d => d.date === todayIso);
     if (!hasToday) return;
-    const params = new URLSearchParams(location.search);
-    if (!params.get('dayDate')) dayDateSel.value = todayIso;
-    if (!params.get('teacherDate')) teacherDateSel.value = todayIso;
+    const boot = window.__STREAMLIT_BOOT__;
+    const sharedByBoot = boot && typeof boot === 'object' && boot.share === '1';
+    const sharedByUrl = isSharedState(new URLSearchParams(location.search));
+    if (sharedByBoot || sharedByUrl) return;
+    dayDateSel.value = todayIso;
+    teacherDateSel.value = todayIso;
+    switchTab('day');
   }
 
   // ---- Helpers ----
@@ -1149,15 +1207,12 @@
     const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
     const className = DATA.classes.includes(cls) ? cls : (DATA.classes[0] || '');
     const sched = d.classSchedules[className] || {};
-    let h = `<div class="matrix-period"><table><thead><tr><th>班別</th>`;
-    for (let i = 1; i <= nP; i++) h += `<th>第${i}節</th>`;
-    h += '</tr></thead><tbody>';
-    h += `<tr><th>${escapeHtml(className)}</th>`;
+    let h = `<div class="matrix-class-view"><table><caption>${escapeHtml(className)} 班時間表</caption><tbody>`;
     for (let i = 1; i <= nP; i++) {
       const v = sched[`p${i}`] || '';
-      h += `<td class="${v ? '' : 'empty'}">${escapeHtml(v) || '—'}</td>`;
+      h += `<tr><th>第${i}節</th><td class="${v ? '' : 'empty'}">${escapeHtml(v) || '—'}</td></tr>`;
     }
-    h += '</tr></tbody></table></div>';
+    h += '</tbody></table></div>';
     return h;
   }
 
@@ -1369,7 +1424,10 @@
         chatHistory = bootCfg.chatHistory
           .filter(m => m && (m.role === 'user' || m.role === 'assistant') && m.content)
           .slice(-12);
-        chatHistory.forEach(m => appendChatBubble(m.role, m.content, false));
+        chatHistory.forEach((m, idx) => {
+          if (shouldDeferStreamlitReply(m, idx, chatHistory)) return;
+          appendChatBubble(m.role, m.content, false);
+        });
       } else {
         const hist = localStorage.getItem(CHAT_HISTORY_STORAGE);
         if (hist) {
@@ -1399,6 +1457,35 @@
   function updateChatBubble(el, text){
     el.textContent = text;
     chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  }
+  function shouldDeferStreamlitReply(message, idx, history){
+    return Boolean(
+      bootCfg.aiReply &&
+      message.role === 'assistant' &&
+      idx === history.length - 1 &&
+      String(message.content || '').trim() === String(bootCfg.aiReply || '').trim()
+    );
+  }
+  function revealChatBubble(el, text){
+    const full = String(text || '');
+    if (!full) {
+      updateChatBubble(el, '（無回覆內容）');
+      chatBusy = false;
+      chatSendBtn.disabled = false;
+      return;
+    }
+    el.textContent = '';
+    let i = 0;
+    const step = Math.max(2, Math.ceil(full.length / 140));
+    const timer = window.setInterval(() => {
+      i = Math.min(full.length, i + step);
+      updateChatBubble(el, full.slice(0, i));
+      if (i >= full.length) {
+        window.clearInterval(timer);
+        chatBusy = false;
+        chatSendBtn.disabled = false;
+      }
+    }, 18);
   }
   function applyAiBackendHints(){
     if (AI_MODE === 'streamlit') {
@@ -1458,27 +1545,27 @@
       saveChatPrefs();
       return;
     } else if (lastAssistant && (lastAssistant.textContent === '…' || lastAssistant.textContent.includes('查詢中'))) {
-      updateChatBubble(lastAssistant, replyText);
+      revealChatBubble(lastAssistant, replyText);
     } else {
-      appendChatBubble('assistant', replyText, true);
+      revealChatBubble(appendChatBubble('assistant', '', true), replyText);
     }
 
     // Persist to history if we have the question
     const qToSave = savedQ || (chatMessagesEl.querySelectorAll('.chat-msg.user').length
       ? [...chatMessagesEl.querySelectorAll('.chat-msg.user')].pop().textContent : '');
     if (qToSave) {
-      // Avoid duplicating if already the last in history
-      const lastH = chatHistory.length ? chatHistory[chatHistory.length-1] : null;
-      if (!lastH || lastH.content.trim() !== qToSave.trim()) {
+      const lastPairAlreadySaved = chatHistory.length >= 2 &&
+        chatHistory[chatHistory.length - 2].role === 'user' &&
+        chatHistory[chatHistory.length - 1].role === 'assistant' &&
+        chatHistory[chatHistory.length - 2].content.trim() === qToSave.trim() &&
+        chatHistory[chatHistory.length - 1].content.trim() === replyText.trim();
+      if (!lastPairAlreadySaved) {
         chatHistory.push({ role: 'user', content: qToSave });
+        chatHistory.push({ role: 'assistant', content: replyText });
       }
-      chatHistory.push({ role: 'assistant', content: replyText });
       chatHistory = chatHistory.slice(-12);
       saveChatPrefs();
     }
-
-    chatBusy = false;
-    chatSendBtn.disabled = false;
   }
 
   const DUTY_SECTION_LABELS = {

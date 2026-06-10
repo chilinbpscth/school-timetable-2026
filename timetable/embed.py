@@ -12,6 +12,7 @@ BUILD = ROOT / "build.py"
 
 BOOT_KEYS = (
     "tab",
+    "share",
     "dayDate",
     "teacherDate",
     "teacherName",

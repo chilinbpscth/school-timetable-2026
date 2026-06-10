@@ -15,16 +15,17 @@
     iframe {
       display: block;
       width: 100%;
-      height: 1500px;
+      min-height: 100vh;
       border: 0;
       margin: 0;
       padding: 0;
       background: #f7f5f0;
+      overflow: hidden;
     }
   </style>
 </head>
 <body>
-  <iframe id="ui" title="時間表查詢"></iframe>
+  <iframe id="ui" title="時間表查詢" scrolling="no"></iframe>
   <script>
     const Streamlit = {
       ready() {
@@ -52,19 +53,85 @@
 
     const ui = document.getElementById('ui');
     let lastHtml = '';
+    let resizeObserver = null;
+    let mutationObserver = null;
+    let lastHeight = 0;
+    const MIN_COMPONENT_HEIGHT = 5200;
+
+    function measureContentHeight() {
+      const doc = ui.contentDocument;
+      if (!doc) return 0;
+      const body = doc.body;
+      const root = doc.documentElement;
+      if (!body || !root) return 0;
+      const elementBottom = Array.from(body.querySelectorAll('*')).reduce((max, el) => {
+        const rect = el.getBoundingClientRect();
+        return Math.max(max, rect.bottom);
+      }, 0);
+      return Math.max(
+        body.scrollHeight,
+        body.offsetHeight,
+        root.clientHeight,
+        root.scrollHeight,
+        root.offsetHeight,
+        elementBottom,
+        window.innerHeight || 0
+      );
+    }
+
+    function setComponentHeight(height) {
+      const nextHeight = Math.max(MIN_COMPONENT_HEIGHT, Math.ceil(height || 0));
+      if (!nextHeight || Math.abs(nextHeight - lastHeight) < 4) return;
+      lastHeight = nextHeight;
+      ui.style.height = nextHeight + 'px';
+      Streamlit.setFrameHeight(nextHeight);
+    }
+
+    function scheduleResize() {
+      window.requestAnimationFrame(() => setComponentHeight(measureContentHeight()));
+    }
+
+    function watchInnerDocument() {
+      if (resizeObserver) resizeObserver.disconnect();
+      if (mutationObserver) mutationObserver.disconnect();
+
+      const doc = ui.contentDocument;
+      const body = doc && doc.body;
+      const root = doc && doc.documentElement;
+      if (!body || !root) {
+        scheduleResize();
+        return;
+      }
+
+      resizeObserver = new ResizeObserver(scheduleResize);
+      resizeObserver.observe(body);
+      resizeObserver.observe(root);
+
+      mutationObserver = new MutationObserver(scheduleResize);
+      mutationObserver.observe(body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        characterData: true,
+      });
+
+      scheduleResize();
+      setTimeout(scheduleResize, 200);
+      setTimeout(scheduleResize, 800);
+    }
 
     function render(args) {
       const html = (args && args.html) || '';
-      const height = Number((args && args.height) || 1500);
-      if (height && height !== ui.height) {
-        ui.style.height = height + 'px';
-        Streamlit.setFrameHeight(height);
-      }
+      const height = Number((args && args.height) || MIN_COMPONENT_HEIGHT);
+      if (height) setComponentHeight(height);
       if (html && html !== lastHtml) {
         lastHtml = html;
         ui.srcdoc = html;
       }
     }
+
+    ui.addEventListener('load', watchInnerDocument);
+    window.addEventListener('resize', scheduleResize);
 
     window.addEventListener('message', event => {
       const data = event.data || {};
@@ -83,7 +150,7 @@
     });
 
     Streamlit.ready();
-    Streamlit.setFrameHeight(1500);
+    setComponentHeight(MIN_COMPONENT_HEIGHT);
   </script>
 </body>
 </html>

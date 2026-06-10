@@ -164,7 +164,7 @@ except Exception as e:
     st.error(f"無法載入課表 UI：{e}")
     st.stop()
 
-component_event = TIMETABLE_COMPONENT(html=ui_html, height=1500, key="timetable_ui")
+component_event = TIMETABLE_COMPONENT(html=ui_html, height=5200, key="timetable_ui")
 if isinstance(component_event, dict) and component_event.get("type") == "timetable-ai-request":
     did_process = process_ai_request(
         str(component_event.get("question") or ""),

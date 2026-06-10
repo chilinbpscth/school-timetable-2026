@@ -89,10 +89,12 @@ cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 api_key = "sk-your-deepseek-api-key-here"
 base_url = "https://api.deepseek.com"
 model_read = "deepseek-v4-flash"
-# model_write = "deepseek-v4-pro"   # 如需要
+model_write = "deepseek-v4-pro"     # 複雜查詢自動使用
 ```
 
 儲存後按 **Reboot app**。
+
+AI 查詢會自動分流：一般查日期、班別、老師用 `model_read`（Flash）；比較、安排、跨多日、多位老師或多條件問題會用 `model_write`（Pro）。
 
 Streamlit Cloud 會自動根據 `requirements.txt` 安裝依賴。
 
