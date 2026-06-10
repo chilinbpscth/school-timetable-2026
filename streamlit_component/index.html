@@ -52,13 +52,76 @@
 
     const ui = document.getElementById('ui');
     let lastHtml = '';
+    let resizeObserver = null;
+    let mutationObserver = null;
+    let measureTimer = 0;
+    let lastHeight = 0;
+
+    function disconnectObservers() {
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+        resizeObserver = null;
+      }
+      if (mutationObserver) {
+        mutationObserver.disconnect();
+        mutationObserver = null;
+      }
+    }
+
+    function measureHeight() {
+      const doc = ui.contentDocument;
+      if (!doc || !doc.body) return;
+      const body = doc.body;
+      const root = doc.documentElement;
+      const height = Math.ceil(Math.max(
+        body.scrollHeight,
+        root ? root.scrollHeight : 0,
+        body.offsetHeight,
+        root ? root.offsetHeight : 0
+      ));
+      if (!height || height === lastHeight) return;
+      lastHeight = height;
+      ui.style.height = height + 'px';
+      Streamlit.setFrameHeight(height);
+    }
+
+    function scheduleMeasure() {
+      if (measureTimer) return;
+      measureTimer = window.requestAnimationFrame(() => {
+        measureTimer = 0;
+        measureHeight();
+      });
+    }
+
+    function attachObservers() {
+      disconnectObservers();
+      scheduleMeasure();
+      const doc = ui.contentDocument;
+      if (!doc || !doc.body) return;
+
+      if (window.ResizeObserver) {
+        resizeObserver = new ResizeObserver(scheduleMeasure);
+        resizeObserver.observe(doc.body);
+        if (doc.documentElement) {
+          resizeObserver.observe(doc.documentElement);
+        }
+      }
+      if (window.MutationObserver) {
+        mutationObserver = new MutationObserver(scheduleMeasure);
+        mutationObserver.observe(doc.body, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+          attributes: true,
+        });
+      }
+    }
 
     function render(args) {
       const html = (args && args.html) || '';
       const height = Number((args && args.height) || 1500);
       if (height && height !== ui.height) {
         ui.style.height = height + 'px';
-        Streamlit.setFrameHeight(height);
       }
       if (html && html !== lastHtml) {
         lastHtml = html;
@@ -81,6 +144,9 @@
         });
       }
     });
+
+    ui.addEventListener('load', attachObservers);
+    window.addEventListener('resize', scheduleMeasure);
 
     Streamlit.ready();
     Streamlit.setFrameHeight(1500);
