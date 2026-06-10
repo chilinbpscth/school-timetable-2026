@@ -279,6 +279,62 @@
   .class-matrix table {
     min-width: 700px;
   }
+  .class-matrix-mobile {
+    display: grid;
+    gap: 10px;
+  }
+  .matrix-card {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .matrix-card-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: baseline;
+    padding: 10px 12px;
+    background: #efeadc;
+    border-bottom: 1px solid var(--line);
+  }
+  .matrix-card-head strong {
+    font-size: 15px;
+  }
+  .matrix-card-head span {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .matrix-card-grid {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+  }
+  .matrix-card-row {
+    display: contents;
+  }
+  .matrix-card-row .k,
+  .matrix-card-row .v {
+    border-bottom: 1px solid var(--line);
+    padding: 8px 10px;
+  }
+  .matrix-card-row:last-child .k,
+  .matrix-card-row:last-child .v {
+    border-bottom: none;
+  }
+  .matrix-card-row .k {
+    background: #faf7ee;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .matrix-card-row .v {
+    font-size: 14px;
+    overflow-wrap: anywhere;
+  }
+  .matrix-card-row .v.empty {
+    color: var(--muted);
+  }
   .class-matrix td {
     font-size: 13px;
     min-width: 84px;
@@ -531,6 +587,12 @@
     }
     .class-matrix table {
       min-width: 600px;
+    }
+    .class-matrix-mobile {
+      gap: 8px;
+    }
+    .matrix-card-grid {
+      grid-template-columns: 82px 1fr;
     }
   }
 
@@ -1203,6 +1265,7 @@
   }
 
   function renderClassMatrix(d){
+    if (window.innerWidth <= 640) return renderClassMatrixMobile(d);
     const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
     let h = '<table class="grid"><thead><tr><th class="cls">班別</th>';
     for (let i=1; i<=nP; i++) h += `<th>第${i}節</th>`;
@@ -1217,6 +1280,21 @@
       h += '</tr>';
     });
     return h + '</tbody></table>';
+  }
+
+  function renderClassMatrixMobile(d){
+    const nP = d.periodCount || (d.type === 'full-day' ? 6 : 4);
+    let h = '<div class="class-matrix-mobile">';
+    DATA.classes.forEach(c => {
+      const sched = d.classSchedules[c] || {};
+      h += `<article class="matrix-card"><div class="matrix-card-head"><strong>${escapeHtml(c)}</strong><span>${nP} 節總覽</span></div><div class="matrix-card-grid">`;
+      for (let i=1; i<=nP; i++) {
+        const v = sched[`p${i}`] || '';
+        h += `<div class="matrix-card-row"><div class="k">第${i}節</div><div class="v ${v ? '' : 'empty'}">${escapeHtml(v) || '—'}</div></div>`;
+      }
+      h += '</div></article>';
+    });
+    return h + '</div>';
   }
 
   function renderClassByPeriod(d, periodKey){
